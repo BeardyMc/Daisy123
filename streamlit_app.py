@@ -130,19 +130,19 @@ elif op == "-":
 elif op == "×":
   correct_answer = n1 * n2
 
-# --- Answer Form ---
-with st.form(key="math_form", clear_on_submit=True):
-  user_answer = st.number_input(
-      "Type your answer here:", value=0, step=1, format="%d"
-  )
-  submit_button = st.form_submit_button(label="Submit Answer 🚀")
+# --- Initialize feedback state variables ---
+if "last_feedback" not in st.session_state:
+  st.session_state.last_feedback = None
+if "trigger_balloons" not in st.session_state:
+  st.session_state.trigger_balloons = False
 
 if submit_button:
   st.session_state.total_questions += 1
   if user_answer == correct_answer:
     st.session_state.score += 1
     st.session_state.streak += 1
-    st.success(
+    st.session_state.last_feedback = (
+        "success",
         random.choice(
             [
                 "🎉 Awesome job!",
@@ -150,23 +150,41 @@ if submit_button:
                 "🚀 Nailed it!",
                 "👏 Brilliant!",
             ]
-        )
+        ),
     )
-    # Trigger celebratory balloons every 5 streak wins!
+    # Flag balloons to trigger on the render pass
     if st.session_state.streak % 5 == 0:
-      st.balloons()
+      st.session_state.trigger_balloons = True
+    else:
+      st.session_state.trigger_balloons = False
   else:
     st.session_state.streak = 0
-    st.error(
-        f"❌ Not quite! The correct answer was **{correct_answer}**. Keep going!"
+    st.session_state.last_feedback = (
+        "error",
+        f"❌ Not quite! The correct answer was **{correct_answer}**. Keep"
+        " going!",
     )
+    st.session_state.trigger_balloons = False
 
-  # Generate the next question and refresh view
+  # Generate the next question
   generate_question()
-  st.rerun()
 
-# --- Reset Button ---
-st.markdown("---") 
+
+# --- Display Feedback & Balloons from the Answer Submission ---
+if st.session_state.last_feedback:
+  f_type, f_msg = st.session_state.last_feedback
+  if f_type == "success":
+    st.success(f_msg)
+  elif f_type == "error":
+    st.error(f_msg)
+  # Clear feedback so it doesn't repeat on unrelated page interactions
+  st.session_state.last_feedback = None
+
+if st.session_state.trigger_balloons:
+  st.balloons()
+  st.session_state.trigger_balloons = False
+
+
 
 # --- Save Session Score Button ---
 st.markdown("---")
