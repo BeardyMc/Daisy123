@@ -166,15 +166,7 @@ if submit_button:
   st.rerun()
 
 # --- Reset Button ---
-st.markdown("---")
-if st.button("🔄 Reset Game"):
-  st.session_state.score = 0
-  st.session_state.total_questions = 0
-  st.session_state.streak = 0
-  generate_question()
-  st.rerun()
-
-
+st.markdown("---") 
 
 # --- Save Session Score Button ---
 st.markdown("---")
