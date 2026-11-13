@@ -176,6 +176,9 @@ if submit_button:
   # Generate the next question
   generate_question()
 
+  # Force immediate rerun so the new question renders instantly
+  st.rerun()
+
 
 # --- Display Feedback & Balloons from the Answer Submission ---
 if st.session_state.last_feedback:
