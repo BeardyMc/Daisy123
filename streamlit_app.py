@@ -4,19 +4,24 @@ import random
 import time
 import requests
 
+st.set_page_config(
+    page_title="Math Practice", page_icon="⭐", layout="centered"
+)
+
+# --- Title & Header ---
+st.title("🌟 Math Practice for Daisy 🌟")
+st.write(
+    "Test your multiplication and arithmetic skills! Answer correctly to build"
+    " your streak and score points!"
+)
+
+# --- Initialize Session State ---
+if "score" not in st.session_state:
+  st.session_state.score = 0
+if "total_questions" not in st.session_state:
+  st.session_state.total_questions = 0
+if "streak" not in st.session_state:
+  st.session_state.streak = 0
 
 
-# Use your actual credentials here
-API_KEY = "$2a$10$HjYpT8u2QEeuPI8L0Q/JUuONqkw7vXUuOhBRr3f8ytAhKdKnkyLdu"
-BIN_ID = "6af77532ac6210605a85d78d"
 
-# The meta endpoint for updating bin names
-url = f"https://api.jsonbin.io/v3/b/{BIN_ID}/meta/name"
-
-headers = {
-    "X-Master-Key": API_KEY,
-    "X-Bin-Name": "Daisy123",  # Change this to whatever name you want (1-128 characters)
-}
-
-response = requests.put(url, json={}, headers=headers)
-print(response.status_code, response.json())
