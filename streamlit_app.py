@@ -136,6 +136,13 @@ if "last_feedback" not in st.session_state:
 if "trigger_balloons" not in st.session_state:
   st.session_state.trigger_balloons = False
 
+# --- Answer Form ---
+with st.form(key="math_form", clear_on_submit=True):
+  user_answer = st.number_input(
+      "Type your answer here:", value=0, step=1, format="%d"
+  )
+  submit_button = st.form_submit_button(label="Submit Answer 🚀")
+
 if submit_button:
   st.session_state.total_questions += 1
   if user_answer == correct_answer:
