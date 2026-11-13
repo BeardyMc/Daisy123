@@ -55,7 +55,7 @@ def save_score_to_bin(score, total, mode):
 # --- Title & Header ---
 st.title("🌟 Daisy's Maths Practice")
 st.write(
-    "Test your multiplication skills! Answer correctly to build your streak, and score points."
+    "Test your multiplication skills, Daisy! Answer correctly to build your streak, and score points. We can even save scores to compare. Try different modes like division for a challenge! Get 5 in a row!"
 )
 
 # --- Initialize Session State ---
@@ -162,8 +162,12 @@ if "trigger_balloons" not in st.session_state:
 # --- Answer Form ---
 with st.form(key="math_form", clear_on_submit=True):
   user_answer = st.number_input(
-      "Type your answer here:", value=0, step=1, format="%d"
-  )
+      "Type your answer here:",
+      value=None,  # 👈 Starts completely blank!
+      step=1,
+      format="%d",
+      placeholder="Type your answer...",  # 👈 Helpful grey text prompt
+  ) 
   submit_button = st.form_submit_button(label="Submit Answer 🚀")
 
 if submit_button:
@@ -175,9 +179,9 @@ if submit_button:
         "success",
         random.choice(
             [
-                "🎉 Awesome job!",
-                "⭐ Correct! You're a math superstar!",
-                "🚀 Nailed it!",
+                "🎉 Awesome job Daisy!",
+                "⭐ Correct! You're a superstar!",
+                "🚀 Nailed it girl!",
                 "👏 Brilliant!",
             ]
         ),
