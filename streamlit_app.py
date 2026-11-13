@@ -77,7 +77,12 @@ if "num1" not in st.session_state:
 st.sidebar.header("⚙️ Game Settings")
 practice_mode = st.sidebar.selectbox(
     "Choose Mode",
-    ["Multiplication Only (1-12)", "Mixed Arithmetic (+, -, ×)", "Easy Addition"],
+    [
+        "Multiplication Only (1-12)",
+        "Division Only (÷)",
+        "Easy Addition",
+        "Mixed Arithmetic (+, -, ×, ÷)",
+    ],
 )
 
 
@@ -87,6 +92,14 @@ def generate_question():
     st.session_state.num1 = random.randint(1, 12)
     st.session_state.num2 = random.randint(1, 12)
     st.session_state.op = "×"
+  elif practice_mode == "Division Only (÷)":
+    a = random.randint(1, 12)
+    b = random.randint(1, 12)
+    st.session_state.num1 = (
+        a * b
+    )  # Product becomes the dividend (e.g. 48 ÷ 8 = 6)
+    st.session_state.num2 = b
+    st.session_state.op = "÷"
   elif practice_mode == "Easy Addition":
     st.session_state.num1 = random.randint(1, 20)
     st.session_state.num2 = random.randint(1, 20)
@@ -129,6 +142,8 @@ elif op == "-":
   correct_answer = n1 - n2
 elif op == "×":
   correct_answer = n1 * n2
+elif op == "÷":
+  correct_answer = n1 // n2
 
 # --- Initialize feedback state variables ---
 if "last_feedback" not in st.session_state:
