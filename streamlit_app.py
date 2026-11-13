@@ -178,7 +178,7 @@ if st.button("🔄 Reset Game"):
 
 # --- Save Session Score Button ---
 st.markdown("---")
-col_save, col_reset = st.columns(2)
+col_save, col_reset = st.columns(2, wrap=False)
 
 with col_save:
   if st.button("💾 Save Score to Cloud"):
