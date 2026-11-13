@@ -176,12 +176,20 @@ daisy_success_messages = [
     "⭐ You go girl!",
     "🚀 You know it 👏",
     "🌟 Look at you go, Daisy!",
-    "👏 Superstar math skills!",
-    "🎉 Awesome job, nearly-nine-year-old!",
+    "👏 Superstar skills!",
+    "🎉 Awesome job Daisy!",
     "⭐ Brilliant work, Daisy!",
     "🚀 You're crushing it!",
     "👏 High five, math champion!",
     "🌟 Boom! Nailed it, Daisy!",
+    "✨ OMG, literally a math genius!",
+    "💎 Literally crushing it, Daisy! 💅",
+    "🫵 OMG nailed it!",
+    "👑 Your aura is literally fire", 
+    "👸 This is giving Princess vibes", 
+    "💫 Out of this world!", 
+    "🧚 Literally unstoppable!", 
+    "🌼 Daisy the Superstar!", 
 ]
 
 
