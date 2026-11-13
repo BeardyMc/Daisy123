@@ -64,7 +64,7 @@ def generate_question():
 
 
 # --- Scoreboard Display ---
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, wrap=False)
 col1.metric("Score 🏆", st.session_state.score)
 col2.metric("Answered 📝", st.session_state.total_questions)
 col3.metric("Streak 🔥", st.session_state.streak)
