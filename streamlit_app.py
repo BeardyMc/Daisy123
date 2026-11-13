@@ -119,6 +119,14 @@ def generate_question():
           st.session_state.num1,
       )
 
+# Detect if the mode changed in the sidebar and update the question immediately
+if (
+    "prev_practice_mode" not in st.session_state
+    or st.session_state.prev_practice_mode != practice_mode
+):
+  st.session_state.prev_practice_mode = practice_mode
+  generate_question()
+
 
 # --- Scoreboard Display ---
 col1, col2, col3 = st.columns(3, wrap=False)
