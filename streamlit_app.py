@@ -50,9 +50,7 @@ def save_score_to_bin(score, total, mode):
 # --- Title & Header ---
 st.title("🌟 Daisy's Maths Practice")
 st.write(
-    "Test your multiplication and arithmetic skills! Fill the grid to reach"
-    " 100% completion!"
-)
+    "Test your multiplication and arithmetic skills, Daisy! Try different game modes in top left settings, and try to beat your high score!" )
 
 # --- Initialize Session State ---
 if "score" not in st.session_state:
@@ -108,7 +106,7 @@ practice_mode = st.sidebar.selectbox(
         "Multiplication Table (Grid Completion)",
         "Rapid Fire: Multiplication (1-12)",
         "Rapid Fire: Division (÷)",
-        "Rapid Fire: Easy Addition",
+        "Rapid Fire: Simple Addition",
         "Rapid Fire: Mixed Arithmetic",
     ],
 )
@@ -126,7 +124,7 @@ def generate_question():
     st.session_state.num1 = a * b
     st.session_state.num2 = b
     st.session_state.op = "÷"
-  elif practice_mode == "Rapid Fire: Easy Addition":
+  elif practice_mode == "Rapid Fire: Simple Addition":
     st.session_state.num1 = random.randint(1, 20)
     st.session_state.num2 = random.randint(1, 20)
     st.session_state.op = "+"
@@ -171,6 +169,21 @@ if (
     and "num1" not in st.session_state
 ):
   generate_question()
+
+# Addable list of encouraging success calls
+daisy_success_messages = [
+    "🎉 Well done, Daisy!",
+    "⭐ You go girl!",
+    "🚀 You know it 👏",
+    "🌟 Look at you go, Daisy!",
+    "👏 Superstar math skills!",
+    "🎉 Awesome job, nearly-nine-year-old!",
+    "⭐ Brilliant work, Daisy!",
+    "🚀 You're crushing it!",
+    "👏 High five, math champion!",
+    "🌟 Boom! Nailed it, Daisy!",
+]
+
 
 
 # ==========================================
@@ -235,7 +248,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
   if completed_count >= 144:
     st.balloons()
     st.success(
-        "🎉 Incredible! You've reached 100% completion on the entire grid!"
+        "🎉 Well done, Daisy! You've reached 100% completion on the entire grid!"
     )
     st.write(
         f"**Final Stats:** {st.session_state.grid_correct_score} correct answers"
@@ -276,14 +289,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
           st.session_state.streak += 1
           st.session_state.last_feedback = (
               "success",
-              random.choice(
-                  [
-                      "🎉 Awesome job!",
-                      "⭐ Correct! Square filled in!",
-                      "🚀 Nailed it!",
-                      "👏 Brilliant!",
-                  ]
-              ),
+              random.choice(daisy_success_messages),
           )
           if st.session_state.streak % 5 == 0:
             st.session_state.trigger_balloons = True
@@ -363,14 +369,7 @@ else:
         st.session_state.streak += 1
         st.session_state.last_feedback = (
             "success",
-            random.choice(
-                [
-                    "🎉 Awesome job!",
-                    "⭐ Correct! You're a math superstar!",
-                    "🚀 Nailed it!",
-                    "👏 Brilliant!",
-                ]
-            ),
+            random.choice(daisy_success_messages),
         )
         if st.session_state.streak % 5 == 0:
           st.session_state.trigger_balloons = True
