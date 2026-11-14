@@ -185,11 +185,12 @@ daisy_success_messages = [
     "✨ OMG, literally a math genius!",
     "💎 Literally crushing it, Daisy! 💅",
     "🫵 OMG nailed it!",
-    "👑 Your aura is literally fire", 
+    "👑 Your aura is literally sunshine", 
     "👸 This is giving Princess vibes", 
     "💫 Out of this world!", 
     "🧚 Literally unstoppable!", 
     "🌼 Daisy the Superstar!", 
+    "🌄 Sunshine and Daisies, you're glowing!", 
 ]
 
 
