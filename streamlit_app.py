@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 st.set_page_config(
-    page_title="Daisy's Math Practice", page_icon="⭐", layout="centered"
+    page_title="Daisy's Maths Practice", page_icon="⭐", layout="centered"
 )
 
 
