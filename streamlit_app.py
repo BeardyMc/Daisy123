@@ -180,9 +180,9 @@ daisy_success_messages = [
     "🎉 Awesome job Daisy!",
     "⭐ Brilliant work, Daisy!",
     "🚀 You're crushing it!",
-    "👏 High five, math champion!",
+    "👏 High five, maths champion!",
     "🌟 Boom! Nailed it, Daisy!",
-    "✨ OMG, literally a math genius!",
+    "✨ OMG, literally a maths genius!",
     "💎 Literally crushing it, Daisy! 💅",
     "🫵 OMG nailed it!",
     "👑 Your aura is literally sunshine", 
@@ -190,7 +190,7 @@ daisy_success_messages = [
     "💫 Out of this world!", 
     "🧚 Literally unstoppable!", 
     "🌼 Daisy the Superstar!", 
-    "🌄 Sunshine and Daisies, you're glowing!", 
+    "🌄 Sunshine and daisies, you're glowing!", 
 ]
 
 
@@ -215,7 +215,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
 
   col1, col2, col3 = st.columns(3, wrap=False)
   col1.metric("Correct Answers ⭐", st.session_state.grid_correct_score)
-  col2.metric("Revealed / Failed ⚠️", st.session_state.grid_failed_score)
+  col2.metric("Revealed ⚠️", st.session_state.grid_failed_score)
   col3.metric("Completed 🗺️", f"{completed_count}/144")
 
   st.markdown("---")
