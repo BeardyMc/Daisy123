@@ -1,7 +1,9 @@
 from datetime import datetime
 import random
 import requests
+import time
 import streamlit as st
+
 
 st.set_page_config(
     page_title="Daisy's Maths Practice", page_icon="⭐", layout="centered"
@@ -63,6 +65,10 @@ if "last_feedback" not in st.session_state:
   st.session_state.last_feedback = None
 if "trigger_balloons" not in st.session_state:
   st.session_state.trigger_balloons = False
+if "start_time" not in st.session_state:
+    st.session_state.start_time = None
+if "elapsed_time" not in st.session_state:
+    st.session_state.elapsed_time = 0
 
 # Grid Mode State Initialization
 if "grid_completed" not in st.session_state:
@@ -90,12 +96,20 @@ def pick_next_grid_target():
   else:
     st.session_state.grid_target = None
 
-
 # Initialize target if none set
 if st.session_state.grid_target is None and len(
     st.session_state.grid_completed
 ) < 144:
   pick_next_grid_target()
+
+
+# Helper function to format seconds into "X min Ys" 
+def format_time(seconds):
+    mins = int(seconds // 60)
+    secs = int(seconds % 60)
+    if mins > 0:
+        return f"{mins} min {secs}s"
+    return f"{secs}s"
 
 
 # --- Sidebar Settings ---
@@ -161,6 +175,7 @@ if (
     or st.session_state.prev_practice_mode != practice_mode
 ):
   st.session_state.prev_practice_mode = practice_mode
+  st.session_state.start_time = None
   if practice_mode != "Multiplication Table (Grid Completion)":
     generate_question()
 
@@ -255,13 +270,16 @@ if practice_mode == "Multiplication Table (Grid Completion)":
 
   # Check if grid is fully completed
   if completed_count >= 144:
+    total_time = time.time() - st.session_state.start_time
+    formatted_duration = format_time(total_time) 
     st.balloons()
     st.success(
-        "🎉 Well done, Daisy! You've reached 100% completion on the entire grid!"
+        f"🎉 Well done, Daisy! You finished the grid in {formatted_duration}!"
     )
     st.write(
         f"**Final Stats:** {st.session_state.grid_correct_score} correct answers"
         f" | {st.session_state.grid_failed_score} revealed squares."
+        f" | Time taken: {formatted_duration} 
     )
     if st.button("🔄 Play Again / Reset Grid"):
       st.session_state.grid_completed = {}
@@ -295,6 +313,8 @@ if practice_mode == "Multiplication Table (Grid Completion)":
         if user_answer == correct_answer:
           st.session_state.grid_completed[(r, c)] = "correct"
           st.session_state.grid_correct_score += 1
+          if st.session_state.start_time is None:
+              st.session_state.start_time = time.time()
           st.session_state.streak += 1
           st.session_state.last_feedback = (
               "success",
