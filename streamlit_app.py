@@ -279,7 +279,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
     st.write(
         f"**Final Stats:** {st.session_state.grid_correct_score} correct answers"
         f" | {st.session_state.grid_failed_score} revealed squares."
-        f" | Time taken: {formatted_duration} 
+        f" | Time taken: {formatted_duration}"
     )
     if st.button("🔄 Play Again / Reset Grid"):
       st.session_state.grid_completed = {}
