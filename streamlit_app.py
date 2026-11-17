@@ -478,7 +478,7 @@ elif practice_mode == "Coin math":
 
   with st.form(key="coin_form", clear_on_submit=True):
     # 2-Column Grid Layout to cut vertical length in half!
-    c_col1, c_col2 = st.columns(2)
+    c_col1, c_col2 = st.columns(2, wrap=False)
 
     with c_col1:
       c50 = st.number_input("50p coins", min_value=0, value=0, step=1, format="%d")
