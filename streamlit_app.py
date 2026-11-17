@@ -222,21 +222,30 @@ def generate_question():
       st.session_state.op = "-" 
 
 
-# Detect if mode changed in sidebar and update accordingly
+# --- Detect Mode OR Sub-menu Changes ---
+current_filter_state = (practice_mode, tuple(selected_tables), addition_limit)
+
 if (
-    "prev_practice_mode" not in st.session_state
-    or st.session_state.prev_practice_mode != practice_mode
+    "prev_filter_state" not in st.session_state
+    or st.session_state.prev_filter_state != current_filter_state
 ):
-  st.session_state.prev_practice_mode = practice_mode
+  st.session_state.prev_filter_state = current_filter_state
   st.session_state.start_time = None
-  if practice_mode != "Multiplication Table (Grid Completion)":
+  if practice_mode not in [
+      "Multiplication Table (Grid Completion)",
+      "Coin math",
+  ]:
     generate_question()
 
 if (
-    practice_mode != "Multiplication Table (Grid Completion)"
+    practice_mode not in [
+        "Multiplication Table (Grid Completion)",
+        "Coin math",
+    ]
     and "num1" not in st.session_state
 ):
   generate_question()
+
 
 # Addable list of encouraging success calls
 daisy_success_messages = [
