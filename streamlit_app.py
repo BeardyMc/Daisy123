@@ -151,7 +151,7 @@ if practice_mode in [
         range(1, 13)
     )  # Fallback if she clears them all accidentally
 
-elif practice_mode in [
+if practice_mode in [
     "Rapid Fire: Simple Addition",
     "Rapid Fire: Mixed Arithmetic",
 ]:
