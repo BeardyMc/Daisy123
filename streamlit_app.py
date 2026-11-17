@@ -424,6 +424,8 @@ else:
     else:
       st.session_state.total_questions += 1
       if user_answer == correct_answer:
+        if st.session_state.start_time is None:
+          st.session_state.start_time = time.time()
         st.session_state.score += 1
         st.session_state.streak += 1
 
