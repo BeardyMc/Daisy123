@@ -118,6 +118,16 @@ def format_time(seconds):
         return f"{mins} min {secs:.0f}s"
     return f"{secs:.1f}s"
 
+# --- Helper to calculate minimum coins for UK currency ---
+def get_min_coins(target):
+  coins = [50, 20, 10, 5, 2, 1]
+  count = 0
+  remaining = target
+  for coin in coins:
+    count += remaining // coin
+    remaining %= coin
+  return count
+
 
 # --- Sidebar Settings ---
 st.sidebar.header("⚙️ Game Settings")
@@ -498,27 +508,40 @@ elif practice_mode == "Coin math":
       st.session_state.start_time = time.time()
     
     total_calculated = (c50 * 50) + (c20 * 20) + (c10 * 10) + (c5 * 5) + (c2 * 2) + (c1 * 1)
+    user_total_coins = c50 + c20 + c10 + c5 + c2 + c1
     st.session_state.total_questions += 1
 
     if total_calculated == st.session_state.coin_target:
-      st.session_state.score += 1
-      st.session_state.streak += 1
-      elapsed_time = time.time() - st.session_state.start_time
-      formatted_duration = format_time(elapsed_time)
-      avg_time = format_time(elapsed_time / st.session_state.total_questions)
-      st.session_state.current_save = {
-          "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-          "mode": practice_mode,
-          "total": st.session_state.total_questions,
-          "score": st.session_state.score,
-          "total_time_seconds": formatted_duration,
-          "avg_time_per_question": avg_time,
-      }
-      st.session_state.last_feedback = ("success", random.choice(daisy_success_messages))
-      if st.session_state.streak % 5 == 0:
-        st.session_state.trigger_balloons = True
-      st.session_state.coin_target = random.randint(1, 99)
-      st.rerun()
+      min_possible_coins = get_min_coins(st.session_state.coin_target)
+
+      if user_total_coins == min_possible_coins:
+        # Correct amount AND most efficient!
+        st.session_state.score += 1
+        st.session_state.streak += 1
+        elapsed_time = time.time() - st.session_state.start_time
+        formatted_duration = format_time(elapsed_time)
+        avg_time = format_time(elapsed_time / st.session_state.total_questions)
+        st.session_state.current_save = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "mode": practice_mode,
+            "total": st.session_state.total_questions,
+            "score": st.session_state.score,
+            "total_time_seconds": formatted_duration,
+            "avg_time_per_question": avg_time,
+        }
+        st.session_state.last_feedback = ("success", random.choice(daisy_success_messages))
+        if st.session_state.streak % 5 == 0:
+          st.session_state.trigger_balloons = True
+        st.session_state.coin_target = random.randint(1, 99)
+        st.rerun()
+      else:
+        # Right value, but too many coins used!
+        st.session_state.streak = 0
+        st.session_state.last_feedback = (
+            "error",
+            f"⚠️ That adds up to **{st.session_state.coin_target}p**, but can you do it with **fewer coins**? (You used {user_total_coins}, perfection is {min_possible_coins}!)",
+        )
+        st.rerun()
     else:
       st.session_state.streak = 0
       st.session_state.last_feedback = (
@@ -526,7 +549,8 @@ elif practice_mode == "Coin math":
           f"❌ Not quite! Your coins added up to **{total_calculated}p**, but the target was **{st.session_state.coin_target}p**.",
       )
       st.session_state.coin_target = random.randint(1, 99)
-      st.rerun()
+      st.rerun() 
+      
 
 
 
