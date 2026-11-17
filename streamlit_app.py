@@ -448,6 +448,25 @@ elif practice_mode == "Coin math":
   if "coin_target" not in st.session_state:
     st.session_state.coin_target = random.randint(1, 99)
 
+# Custom CSS to enlarge number inputs and stepper buttons for mobile touch
+  st.markdown(
+      """
+      <style>
+      div.stNumberInput input {
+          font-size: 18px !important;
+          font-weight: bold !important;
+          text-align: center;
+      }
+      /* Make the stepper container / buttons easier to tap */
+      div.stNumberInput button {
+          transform: scale(1.25);
+          margin: 0px 4px;
+      }
+      </style>
+  """,
+      unsafe_allow_html=True,
+  )
+
   col1, col2, col3 = st.columns(3, wrap=False)
   col1.metric("Score 🏆", st.session_state.score)
   col2.metric("Answered 📝", st.session_state.total_questions)
@@ -458,14 +477,21 @@ elif practice_mode == "Coin math":
   st.write("Select how many of each coin you need:")
 
   with st.form(key="coin_form", clear_on_submit=True):
-    c50 = st.number_input("50p coins", min_value=0, value=0, step=1, format="%d")
-    c20 = st.number_input("20p coins", min_value=0, value=0, step=1, format="%d")
-    c10 = st.number_input("10p coins", min_value=0, value=0, step=1, format="%d")
-    c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
-    c2 = st.number_input("2p coins", min_value=0, value=0, step=1, format="%d")
-    c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
+    # 2-Column Grid Layout to cut vertical length in half!
+    c_col1, c_col2 = st.columns(2)
 
-    submit_coins = st.form_submit_button(label="Check Coins 🚀")
+    with c_col1:
+      c50 = st.number_input("50p coins", min_value=0, value=0, step=1, format="%d")
+      c10 = st.number_input("10p coins", min_value=0, value=0, step=1, format="%d")
+      c2 = st.number_input("2p coins", min_value=0, value=0, step=1, format="%d")
+
+    with c_col2:
+      c20 = st.number_input("20p coins", min_value=0, value=0, step=1, format="%d")
+      c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
+      c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
+
+    submit_coins = st.form_submit_button(label="Check Coins 🚀", use_container_width=True)
+ 
 
   if submit_coins:
     if st.session_state.start_time is None:
