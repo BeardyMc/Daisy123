@@ -1,7 +1,9 @@
 from datetime import datetime
 import random
 import requests
+import time
 import streamlit as st
+
 
 st.set_page_config(
     page_title="Daisy's Maths Practice", page_icon="⭐", layout="centered"
@@ -27,24 +29,28 @@ def load_score_history():
   return []
 
 
-def save_score_to_bin(score, total, mode):
+def save_score_to_bin(new_entry):
   """Appends a new practice session record to JSONBin.io"""
   history = load_score_history()
-  new_entry = {
-      "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-      "score": score,
-      "total": total,
-      "mode": mode,
-  }
   history.append(new_entry)
-  history = history[-50:]  # Keep last 50 entries
-
   payload = {"history": history}
   url = f"https://api.jsonbin.io/v3/b/{BIN_ID}"
+
   try:
-    requests.put(url, json=payload, headers=HEADERS)
-  except Exception:
-    pass
+    response = requests.put(url, json=payload, headers=HEADERS)
+    # Check if JSONBin rejected it (e.g., rate limit, 403, 429)
+    if response.status_code != 200:
+      st.error(
+          f"🚨 **Upload Failed!** Tell Dad immediately — we might have hit the 10,000 request limit! (Status: {response.status_code})"
+      )
+      return False
+    st.success("Score successfully saved! 🌼")
+    return True
+  except Exception as e:
+    st.error(
+        f"🚨 **Network Error:** Tell Dad this happened: `{e}`"
+    )
+    return False
 
 
 # --- Title & Header ---
@@ -63,6 +69,10 @@ if "last_feedback" not in st.session_state:
   st.session_state.last_feedback = None
 if "trigger_balloons" not in st.session_state:
   st.session_state.trigger_balloons = False
+if "start_time" not in st.session_state:
+    st.session_state.start_time = None
+if "current_save" not in st.session_state:
+    st.session_state.current_save = None
 
 # Grid Mode State Initialization
 if "grid_completed" not in st.session_state:
@@ -90,12 +100,20 @@ def pick_next_grid_target():
   else:
     st.session_state.grid_target = None
 
-
 # Initialize target if none set
 if st.session_state.grid_target is None and len(
     st.session_state.grid_completed
 ) < 144:
   pick_next_grid_target()
+
+
+# Helper function to format seconds into "X min Ys" 
+def format_time(seconds):
+    mins = int(seconds // 60)
+    secs = seconds % 60
+    if mins > 0:
+        return f"{mins} min {secs:.1f}s"
+    return f"{secs:.1f}s"
 
 
 # --- Sidebar Settings ---
@@ -161,6 +179,7 @@ if (
     or st.session_state.prev_practice_mode != practice_mode
 ):
   st.session_state.prev_practice_mode = practice_mode
+  st.session_state.start_time = None
   if practice_mode != "Multiplication Table (Grid Completion)":
     generate_question()
 
@@ -255,19 +274,34 @@ if practice_mode == "Multiplication Table (Grid Completion)":
 
   # Check if grid is fully completed
   if completed_count >= 144:
+    total_time = time.time() - st.session_state.start_time
+    formatted_duration = format_time(total_time)
+    avg_time = format_time(total_time / completed_count) 
+    st.session_state.current_save = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "mode": practice_mode,
+        "total": completed_count,
+        "score": st.session_state.grid_correct_score,
+        "total_time_seconds": formatted_duration, 
+        "avg_time_per_question": avg_time,
+    }
+
     st.balloons()
     st.success(
-        "🎉 Well done, Daisy! You've reached 100% completion on the entire grid!"
+        f"🎉 Well done, Daisy! You finished the grid in {formatted_duration}!"
     )
     st.write(
         f"**Final Stats:** {st.session_state.grid_correct_score} correct answers"
         f" | {st.session_state.grid_failed_score} revealed squares."
+        f" | Time taken: {formatted_duration}"
+        f" | Average time per question: {avg_time}"
     )
     if st.button("🔄 Play Again / Reset Grid"):
       st.session_state.grid_completed = {}
       st.session_state.grid_correct_score = 0
       st.session_state.grid_failed_score = 0
       pick_next_grid_target()
+      st.session_state.current_save = None
       st.rerun()
   else:
     r, c = st.session_state.grid_target
@@ -295,6 +329,20 @@ if practice_mode == "Multiplication Table (Grid Completion)":
         if user_answer == correct_answer:
           st.session_state.grid_completed[(r, c)] = "correct"
           st.session_state.grid_correct_score += 1
+          if st.session_state.start_time is None:
+              st.session_state.start_time = time.time()
+          elapsed_time = time.time() - st.session_state.start_time
+          formatted_duration = format_time(elapsed_time)
+          avg_time = format_time(elapsed_time / (completed_count+1)) 
+          st.session_state.current_save = {
+              "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+              "mode": practice_mode,
+              "total": completed_count+1,
+              "score": st.session_state.grid_correct_score,
+              "total_time_seconds": formatted_duration, 
+              "avg_time_per_question": avg_time,
+          }
+
           st.session_state.streak += 1
           st.session_state.last_feedback = (
               "success",
@@ -374,8 +422,23 @@ else:
     else:
       st.session_state.total_questions += 1
       if user_answer == correct_answer:
+        if st.session_state.start_time is None:
+          st.session_state.start_time = time.time()
         st.session_state.score += 1
         st.session_state.streak += 1
+
+        elapsed_time = time.time() - st.session_state.start_time
+        formatted_duration = format_time(elapsed_time)
+        avg_time = format_time(elapsed_time / st.session_state.total_questions) 
+        st.session_state.current_save = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "mode": practice_mode,
+            "total": st.session_state.total_questions,
+            "score": st.session_state.score,
+            "total_time_seconds": formatted_duration, 
+            "avg_time_per_question": avg_time,
+        }
+
         st.session_state.last_feedback = (
             "success",
             random.choice(daisy_success_messages),
@@ -424,29 +487,20 @@ with col_save:
             or st.session_state.grid_failed_score > 0
         )
     ):
-      total_grid_attempts = (
-          st.session_state.grid_correct_score
-          + st.session_state.grid_failed_score
-      )
-      save_score_to_bin(
-          st.session_state.grid_correct_score,
-          total_grid_attempts,
-          practice_mode,
-      )
-      st.success("Score successfully saved to the cloud! 🌟")
+        save_score_to_bin(st.session_state.current_save)
+      
     elif (
         practice_mode != "Multiplication Table (Grid Completion)"
         and st.session_state.total_questions > 0
     ):
-      save_score_to_bin(
-          st.session_state.score, st.session_state.total_questions, practice_mode
-      )
-      st.success("Score successfully saved to the cloud! 🌟")
+        save_score_to_bin(st.session_state.current_save)
+        st.session_state.current_save = None
     else:
-      st.warning("Answer a few questions before saving!")
+        st.warning("Answer a few questions before saving!")
 
 with col_reset:
   if st.button("🔄 Reset Game", key="reset_game_btn"):
+    st.session_state.current_save = None
     if practice_mode == "Multiplication Table (Grid Completion)":
       st.session_state.grid_completed = {}
       st.session_state.grid_correct_score = 0
@@ -456,17 +510,33 @@ with col_reset:
       st.session_state.score = 0
       st.session_state.total_questions = 0
       st.session_state.streak = 0
+
       generate_question()
     st.rerun()
+
 
 # --- Parent / History Dashboard ---
 with st.expander("📊 Past Practice History (Cloud Log)"):
   history = load_score_history()
   if history:
     for entry in reversed(history[-10:]):
+      timestamp = entry.get('timestamp', 'N/A')
+      mode = entry.get('mode', 'Unknown')
+      score = entry.get('score', 0)
+      total = entry.get('total', 0)
+      
+      # Pull the new timing fields gracefully
+      total_time = entry.get('total_time_seconds')
+      avg_time = entry.get('avg_time_per_question')
+      
+      # Build a suffix for time metrics if they exist in the entry
+      timing_str = ""
+      if total_time and avg_time:
+        timing_str = f" | Total: **{total_time}** | Avg: **{avg_time} per question**"
+      
       st.write(
-          f"- **{entry.get('timestamp')}** | Mode: *{entry.get('mode')}* |"
-          f" Score: **{entry.get('score')} / {entry.get('total')}**"
+          f"- **{timestamp}** | Mode: *{mode}* | "
+          f"Score: **{score} / {total}**{timing_str}"
       )
   else:
     st.write("No saved practice sessions yet. Click 'Save Score' after playing!")
