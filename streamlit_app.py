@@ -140,16 +140,15 @@ if practice_mode in [
     "Rapid Fire: Division (÷)",
     "Rapid Fire: Mixed Arithmetic",
 ]:
-  selected_tables = st.sidebar.multiselect(
-      "Choose Multiples to Practice:",
-      options=list(range(1, 13)),
-      default=[2, 3, 4, 5, 6, 7, 8, 9, 11, 12],  # Default to tricky ones or all
-      help="Select which times tables to include in rapid fire.",
-  )
-  if not selected_tables:
-    selected_tables = list(
-        range(1, 13)
-    )  # Fallback if she clears them all accidentally
+  # Create a 4-column grid of checkboxes for numbers 1 to 12
+  cols = st.sidebar.columns(4)
+  for i in range(1, 13):
+    col_idx = (i - 1) % 4
+    with cols[col_idx]:
+      # Default checked
+      is_checked = st.checkbox(f"{i}", value=(i in [2,3,4,5,6,7,8,9,11,12]), key=f"table_chk_{i}")
+      if is_checked:
+        selected_tables.append(i)
 
 if practice_mode in [
     "Rapid Fire: Simple Addition",
