@@ -436,7 +436,7 @@ else:
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "mode": practice_mode,
             "total": st.session_state.total_questions,
-            "score": st.session_state.grid_correct_score,
+            "score": st.session_state.score,
             "total_time_seconds": formatted_duration, 
             "avg_time_per_question": avg_time,
         }
