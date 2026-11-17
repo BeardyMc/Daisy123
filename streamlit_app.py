@@ -238,7 +238,9 @@ def generate_question():
 
 
 # --- Detect Mode OR Sub-menu Changes ---
-current_filter_state = (practice_mode, tuple(selected_tables), addition_limit)
+# Sort the tables tuple so toggling pill order doesn't re-trigger question generation
+current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit)
+
 
 if (
     "prev_filter_state" not in st.session_state
@@ -669,13 +671,18 @@ with col_reset:
       st.session_state.grid_correct_score = 0
       st.session_state.grid_failed_score = 0
       pick_next_grid_target()
+    elif practice_mode == "Coin math":
+      st.session_state.score = 0
+      st.session_state.total_questions = 0
+      st.session_state.streak = 0
+      st.session_state.coin_target = random.randint(1, 99)
     else:
       st.session_state.score = 0
       st.session_state.total_questions = 0
       st.session_state.streak = 0
-
       generate_question()
     st.rerun()
+
 
 
 # --- Parent / History Dashboard ---
