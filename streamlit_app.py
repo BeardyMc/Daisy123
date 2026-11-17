@@ -199,6 +199,7 @@ def generate_question():
     elif op_choice == "×":
       a = random.choice(selected_tables)
       b = random.randint(1, 12)
+      st.session_state.op = "×"
       if random.choice([True, False]):
         st.session_state.num1 = a
         st.session_state.num2 = b
