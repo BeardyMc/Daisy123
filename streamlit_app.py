@@ -112,10 +112,10 @@ if st.session_state.grid_target is None and len(
 # Helper function to format seconds into "X min Ys" 
 def format_time(seconds):
     mins = int(seconds // 60)
-    secs = int(seconds % 60)
+    secs = seconds % 60
     if mins > 0:
-        return f"{mins} min {secs}s"
-    return f"{secs}s"
+        return f"{mins} min {secs:.1f}s"
+    return f"{secs:.1f}s"
 
 
 # --- Sidebar Settings ---
@@ -516,14 +516,29 @@ with col_reset:
       generate_question()
     st.rerun()
 
+
 # --- Parent / History Dashboard ---
 with st.expander("📊 Past Practice History (Cloud Log)"):
   history = load_score_history()
   if history:
     for entry in reversed(history[-10:]):
+      timestamp = entry.get('timestamp', 'N/A')
+      mode = entry.get('mode', 'Unknown')
+      score = entry.get('score', 0)
+      total = entry.get('total', 0)
+      
+      # Pull the new timing fields gracefully
+      total_time = entry.get('total_time_seconds')
+      avg_time = entry.get('avg_time_per_question')
+      
+      # Build a suffix for time metrics if they exist in the entry
+      timing_str = ""
+      if total_time and avg_time:
+        timing_str = f" | Total: **{total_time}** | Avg: **{avg_time}/q**"
+      
       st.write(
-          f"- **{entry.get('timestamp')}** | Mode: *{entry.get('mode')}* |"
-          f" Score: **{entry.get('score')} / {entry.get('total')}**"
+          f"- **{timestamp}** | Mode: *{mode}* | "
+          f"Score: **{score} / {total}**{timing_str}"
       )
   else:
     st.write("No saved practice sessions yet. Click 'Save Score' after playing!")
