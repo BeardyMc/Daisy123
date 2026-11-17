@@ -171,7 +171,7 @@ if practice_mode in [
 
 # Function to generate a new Rapid Fire question
 def generate_question():
-  print(selected_tables)
+  print(selected_tables, flush=True)
   if practice_mode == "Rapid Fire: Multiplication (1-12)":
     a = random.choice(selected_tables)
     b = random.randint(1, 12)
