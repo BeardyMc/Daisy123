@@ -33,6 +33,9 @@ def save_score_to_bin(new_entry):
   """Appends a new practice session record to JSONBin.io"""
   history = load_score_history()
   history.append(new_entry)
+  # Keep the last 1,000 entries for long-term improvement tracking
+  history = history[-1000:] 
+
   payload = {"history": history}
   url = f"https://api.jsonbin.io/v3/b/{BIN_ID}"
 
@@ -323,14 +326,14 @@ if practice_mode == "Multiplication Table (Grid Completion)":
       submit_button = st.form_submit_button(label="Submit Answer 🚀")
 
     if submit_button:
+      if st.session_state.start_time is None:
+        st.session_state.start_time = time.time() 
       if user_answer is None:
         st.warning("Please type an answer first! 😊")
       else:
         if user_answer == correct_answer:
           st.session_state.grid_completed[(r, c)] = "correct"
           st.session_state.grid_correct_score += 1
-          if st.session_state.start_time is None:
-              st.session_state.start_time = time.time()
           elapsed_time = time.time() - st.session_state.start_time
           formatted_duration = format_time(elapsed_time)
           avg_time = format_time(elapsed_time / (completed_count+1)) 
@@ -417,13 +420,13 @@ else:
     submit_button = st.form_submit_button(label="Submit Answer 🚀")
 
   if submit_button:
+    if st.session_state.start_time is None:
+      st.session_state.start_time = time.time()
     if user_answer is None:
       st.warning("Please type an answer first! 😊")
     else:
       st.session_state.total_questions += 1
       if user_answer == correct_answer:
-        if st.session_state.start_time is None:
-          st.session_state.start_time = time.time()
         st.session_state.score += 1
         st.session_state.streak += 1
 
@@ -480,19 +483,7 @@ col_save, col_reset = st.columns(2, wrap=False)
 
 with col_save:
   if st.button("💾 Save Score to Cloud", key="save_cloud_btn"):
-    if (
-        practice_mode == "Multiplication Table (Grid Completion)"
-        and (
-            st.session_state.grid_correct_score > 0
-            or st.session_state.grid_failed_score > 0
-        )
-    ):
-        save_score_to_bin(st.session_state.current_save)
-      
-    elif (
-        practice_mode != "Multiplication Table (Grid Completion)"
-        and st.session_state.total_questions > 0
-    ):
+    if st.session_state.current_save != None:
         save_score_to_bin(st.session_state.current_save)
         st.session_state.current_save = None
     else:
