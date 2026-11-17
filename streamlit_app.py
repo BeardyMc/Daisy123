@@ -210,13 +210,14 @@ def generate_question():
       st.session_state.num2 = random.randint(1, addition_limit)
       st.session_state.op = "+"
     else:
-      st.session_state.num1 = random.randint(1, addition_limit)
-      st.session_state.num2 = random.randint(1, addition_limit)
-      if st.session_state.num1 < st.session_state.num2:
-        st.session_state.num1, st.session_state.num2 = (
-            st.session_state.num2,
-            st.session_state.num1,
-        )
+      a = random.randint(1, addition_limit)
+      b = random.randint(1, addition_limit)
+      if a < b:
+        st.session_state.num1 = b
+        st.session_state.num2 = a
+      else:
+        st.session_state.num1 = a
+        st.session_state.num2 = b
       st.session_state.op = "-" 
 
 
