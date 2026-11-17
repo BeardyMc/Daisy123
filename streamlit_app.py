@@ -131,49 +131,93 @@ practice_mode = st.sidebar.selectbox(
         "Rapid Fire: Mixed Arithmetic",
     ],
 )
+# Dynamic Sidebar Filters based on mode choice
+selected_tables = list(range(1, 13))  # Default fallback
+addition_limit = 20  # Default fallback
+
+if practice_mode in [
+    "Rapid Fire: Multiplication (1-12)",
+    "Rapid Fire: Division (÷)",
+    "Rapid Fire: Mixed Arithmetic",
+]:
+  selected_tables = st.sidebar.multiselect(
+      "Choose Multiples to Practice:",
+      options=list(range(1, 13)),
+      default=[2, 3, 4, 5, 6, 7, 8, 9, 11, 12],  # Default to tricky ones or all
+      help="Select which times tables to include in rapid fire.",
+  )
+  if not selected_tables:
+    selected_tables = list(
+        range(1, 13)
+    )  # Fallback if she clears them all accidentally
+
+elif practice_mode in [
+    "Rapid Fire: Simple Addition",
+    "Rapid Fire: Mixed Arithmetic",
+]:
+  st.sidebar.markdown("---")
+  addition_limit = st.sidebar.slider(
+      "Maximum Addition Number:",
+      min_value=10,
+      max_value=500,
+      value=20,
+      step=5,
+      help="Sets the upper limit for the numbers being added.",
+  )
 
 
 # Function to generate a new Rapid Fire question
 def generate_question():
   if practice_mode == "Rapid Fire: Multiplication (1-12)":
-    st.session_state.num1 = random.randint(1, 12)
-    st.session_state.num2 = random.randint(1, 12)
+    a = random.choice(selected_tables)
+    b = random.randint(1, 12)
+    if random.choice([True, False]):
+      st.session_state.num1 = a
+      st.session_state.num2 = b
+    else:
+      st.session_state.num1 = b
+      st.session_state.num2 = a
     st.session_state.op = "×"
   elif practice_mode == "Rapid Fire: Division (÷)":
+    b = random.choice(selected_tables)
     a = random.randint(1, 12)
-    b = random.randint(1, 12)
     st.session_state.num1 = a * b
     st.session_state.num2 = b
     st.session_state.op = "÷"
   elif practice_mode == "Rapid Fire: Simple Addition":
-    st.session_state.num1 = random.randint(1, 20)
-    st.session_state.num2 = random.randint(1, 20)
+    st.session_state.num1 = random.randint(1, addition_limit)
+    st.session_state.num2 = random.randint(1, addition_limit)
     st.session_state.op = "+"
-  else:  # Mixed Arithmetic
+  elif practice_mode == "Rapid Fire: Mixed Arithmetic":
     op_choice = random.choice(["+", "-", "×", "÷"])
     if op_choice == "÷":
+      b = random.choice(selected_tables)
       a = random.randint(1, 12)
-      b = random.randint(1, 12)
       st.session_state.num1 = a * b
       st.session_state.num2 = b
       st.session_state.op = "÷"
     elif op_choice == "×":
-      st.session_state.num1 = random.randint(1, 12)
-      st.session_state.num2 = random.randint(1, 12)
-      st.session_state.op = "×"
+      a = random.choice(selected_tables)
+      b = random.randint(1, 12)
+      if random.choice([True, False]):
+        st.session_state.num1 = a
+        st.session_state.num2 = b
+      else:
+        st.session_state.num1 = b
+        st.session_state.num2 = a
     elif op_choice == "+":
-      st.session_state.num1 = random.randint(1, 20)
-      st.session_state.num2 = random.randint(1, 20)
+      st.session_state.num1 = random.randint(1, addition_limit)
+      st.session_state.num2 = random.randint(1, addition_limit)
       st.session_state.op = "+"
     else:
-      st.session_state.num1 = random.randint(1, 20)
-      st.session_state.num2 = random.randint(1, 20)
+      st.session_state.num1 = random.randint(1, addition_limit)
+      st.session_state.num2 = random.randint(1, addition_limit)
       if st.session_state.num1 < st.session_state.num2:
         st.session_state.num1, st.session_state.num2 = (
             st.session_state.num2,
             st.session_state.num1,
         )
-      st.session_state.op = "-"
+      st.session_state.op = "-" 
 
 
 # Detect if mode changed in sidebar and update accordingly
