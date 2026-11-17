@@ -428,17 +428,16 @@ else:
         st.session_state.streak += 1
 
         elapsed_time = time.time() - st.session_state.start_time
-          formatted_duration = format_time(total_time)
-          avg_time = format_time(total_time / st.session_state.total_questions) 
-          st.session_state.current_save = {
-              "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-              "mode": practice_mode,
-              "total": st.session_state.total_questions,
-              "score": st.session_state.grid_correct_score,
-              "total_time_seconds": formatted_duration, 
-              "avg_time_per_question": avg_time,
-          }
-
+        formatted_duration = format_time(total_time)
+        avg_time = format_time(total_time / st.session_state.total_questions) 
+        st.session_state.current_save = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "mode": practice_mode,
+            "total": st.session_state.total_questions,
+            "score": st.session_state.grid_correct_score,
+            "total_time_seconds": formatted_duration, 
+            "avg_time_per_question": avg_time,
+        }
 
         st.session_state.last_feedback = (
             "success",
