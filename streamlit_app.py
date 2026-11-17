@@ -142,7 +142,7 @@ if practice_mode in [
 ]:
   # Create a grid of checkboxes for numbers 1 to 12
 # Use st.grid for a clean, non-collapsing multi-item layout on mobile
-  with st.grid(columns=4):
+  with st.sidebar.grid(columns=4):
     for i in range(1, 13):
       is_checked = st.checkbox(f"{i}", value=(i in [2,3,4,5,6,7,8,9,11,12]), key=f"table_chk_{i}")
       if is_checked:
