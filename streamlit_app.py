@@ -493,7 +493,7 @@ with col_save:
         practice_mode != "Multiplication Table (Grid Completion)"
         and st.session_state.total_questions > 0
     ):
-      save_score_to_bin(st.session_state.current_save)
+        save_score_to_bin(st.session_state.current_save)
         st.session_state.current_save = None
     else:
         st.warning("Answer a few questions before saving!")
