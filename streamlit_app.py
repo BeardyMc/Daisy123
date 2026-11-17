@@ -334,8 +334,8 @@ if practice_mode == "Multiplication Table (Grid Completion)":
           if st.session_state.start_time is None:
               st.session_state.start_time = time.time()
           elapsed_time = time.time() - st.session_state.start_time
-          formatted_duration = format_time(total_time)
-          avg_time = format_time(total_time / (completed_count+1)) 
+          formatted_duration = format_time(elapsed_time)
+          avg_time = format_time(elapsed_time / (completed_count+1)) 
           st.session_state.current_save = {
               "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
               "mode": practice_mode,
@@ -430,8 +430,8 @@ else:
         st.session_state.streak += 1
 
         elapsed_time = time.time() - st.session_state.start_time
-        formatted_duration = format_time(total_time)
-        avg_time = format_time(total_time / st.session_state.total_questions) 
+        formatted_duration = format_time(elapsed_time)
+        avg_time = format_time(elapsed_time / st.session_state.total_questions) 
         st.session_state.current_save = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "mode": practice_mode,
