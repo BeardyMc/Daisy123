@@ -140,10 +140,10 @@ if practice_mode in [
     "Rapid Fire: Division (÷)",
     "Rapid Fire: Mixed Arithmetic",
 ]:
-  # Create a 4-column grid of checkboxes for numbers 1 to 12
-  cols = st.sidebar.columns(4, wrap=False)
+  # Create a grid of checkboxes for numbers 1 to 12
+  cols = st.sidebar.columns(3, wrap=False, width="stretch", gap=None)
   for i in range(1, 13):
-    col_idx = (i - 1) % 4
+    col_idx = (i - 1) % 3
     with cols[col_idx]:
       # Default checked
       is_checked = st.checkbox(f"{i}", value=(i in [2,3,4,5,6,7,8,9,11,12]), key=f"table_chk_{i}")
