@@ -141,7 +141,7 @@ if practice_mode in [
     "Rapid Fire: Mixed Arithmetic",
 ]:
   # Create a 4-column grid of checkboxes for numbers 1 to 12
-  cols = st.sidebar.columns(4)
+  cols = st.sidebar.columns(4, wrap=False)
   for i in range(1, 13):
     col_idx = (i - 1) % 4
     with cols[col_idx]:
