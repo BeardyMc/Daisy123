@@ -129,6 +129,7 @@ practice_mode = st.sidebar.selectbox(
         "Rapid Fire: Division (÷)",
         "Rapid Fire: Simple Addition",
         "Rapid Fire: Mixed Arithmetic",
+        "Coin math",
     ],
 )
 # Dynamic Sidebar Filters based on mode choice
@@ -439,6 +440,68 @@ if practice_mode == "Multiplication Table (Grid Completion)":
             st.session_state.trigger_balloons = False
             pick_next_grid_target()
             st.rerun()
+
+# ==========================================
+# MODE 3: COIN MATH
+# ==========================================
+elif practice_mode == "Coin math":
+  if "coin_target" not in st.session_state:
+    st.session_state.coin_target = random.randint(1, 99)
+
+  col1, col2, col3 = st.columns(3, wrap=False)
+  col1.metric("Score 🏆", st.session_state.score)
+  col2.metric("Answered 📝", st.session_state.total_questions)
+  col3.metric("Streak 🔥", st.session_state.streak)
+
+  st.markdown("---")
+  st.markdown(f"### 🪙 Make the target amount: **{st.session_state.coin_target}p**")
+  st.write("Select how many of each coin you need:")
+
+  with st.form(key="coin_form", clear_on_submit=True):
+    c50 = st.number_input("50p coins", min_value=0, value=0, step=1, format="%d")
+    c20 = st.number_input("20p coins", min_value=0, value=0, step=1, format="%d")
+    c10 = st.number_input("10p coins", min_value=0, value=0, step=1, format="%d")
+    c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
+    c2 = st.number_input("2p coins", min_value=0, value=0, step=1, format="%d")
+    c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
+
+    submit_coins = st.form_submit_button(label="Check Coins 🚀")
+
+  if submit_coins:
+    if st.session_state.start_time is None:
+      st.session_state.start_time = time.time()
+    
+    total_calculated = (c50 * 50) + (c20 * 20) + (c10 * 10) + (c5 * 5) + (c2 * 2) + (c1 * 1)
+    st.session_state.total_questions += 1
+
+    if total_calculated == st.session_state.coin_target:
+      st.session_state.score += 1
+      st.session_state.streak += 1
+      elapsed_time = time.time() - st.session_state.start_time
+      formatted_duration = format_time(elapsed_time)
+      avg_time = format_time(elapsed_time / st.session_state.total_questions)
+      st.session_state.current_save = {
+          "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+          "mode": practice_mode,
+          "total": st.session_state.total_questions,
+          "score": st.session_state.score,
+          "total_time_seconds": formatted_duration,
+          "avg_time_per_question": avg_time,
+      }
+      st.session_state.last_feedback = ("success", random.choice(daisy_success_messages))
+      if st.session_state.streak % 5 == 0:
+        st.session_state.trigger_balloons = True
+      st.session_state.coin_target = random.randint(1, 99)
+      st.rerun()
+    else:
+      st.session_state.streak = 0
+      st.session_state.last_feedback = (
+          "error",
+          f"❌ Not quite! Your coins added up to **{total_calculated}p**, but the target was **{st.session_state.coin_target}p**.",
+      )
+      st.session_state.coin_target = random.randint(1, 99)
+      st.rerun()
+
 
 
 # ==========================================
