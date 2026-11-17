@@ -112,7 +112,7 @@ def format_time(seconds):
     mins = int(seconds // 60)
     secs = seconds % 60
     if mins > 0:
-        return f"{mins} min {secs:.1f}s"
+        return f"{mins} min {secs:.0f}s"
     return f"{secs:.1f}s"
 
 
