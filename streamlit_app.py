@@ -33,8 +33,6 @@ def save_score_to_bin(new_entry):
   """Appends a new practice session record to JSONBin.io"""
   history = load_score_history()
   history.append(new_entry)
-  history = history[-50:]  # Keep last 50 entries
-
   payload = {"history": history}
   url = f"https://api.jsonbin.io/v3/b/{BIN_ID}"
 
@@ -534,7 +532,7 @@ with st.expander("📊 Past Practice History (Cloud Log)"):
       # Build a suffix for time metrics if they exist in the entry
       timing_str = ""
       if total_time and avg_time:
-        timing_str = f" | Total: **{total_time}** | Avg: **{avg_time}/q**"
+        timing_str = f" | Total: **{total_time}** | Avg: **{avg_time} per question**"
       
       st.write(
           f"- **{timestamp}** | Mode: *{mode}* | "
