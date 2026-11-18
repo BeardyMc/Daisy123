@@ -645,15 +645,16 @@ elif practice_mode == "Divisions with remainders":
       unsafe_allow_html=True,
   )
 
-  col_q, col_m, col_r = st.columns([1,0.2,1], wrap=False)
-  with col_q:
-      user_quotient = st.number_input("Whole number (Quotient)", min_value=0, step=1, value=None)
-  with col_m:
-      st.write("r")
-  with col_r:
-      user_remainder = st.number_input("Remainder", min_value=0, step=1, value=None)
+  with st.form(key="rem_form", clear_on_submit=True):
+      col_q, col_m, col_r = st.columns([1,0.2,1], wrap=False)
+      with col_q:
+          user_quotient = st.number_input("Whole number (Quotient)", min_value=0, step=1, value=None)
+      with col_m:
+          st.write("r")
+      with col_r:
+          user_remainder = st.number_input("Remainder", min_value=0, step=1, value=None)
 
-  submit_rem = st.form_submit_button(label="Submit answer 🚀", use_container_width=True)
+      submit_rem = st.form_submit_button(label="Submit answer 🚀", use_container_width=True)
 
 
 
