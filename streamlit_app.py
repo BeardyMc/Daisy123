@@ -140,6 +140,7 @@ practice_mode = st.sidebar.selectbox(
         "Rapid Fire: Simple Addition",
         "Rapid Fire: Mixed Arithmetic",
         "Coin math",
+        "Divisions with remainders", 
     ],
 )
 # Dynamic Sidebar Filters based on mode choice
@@ -178,6 +179,18 @@ if practice_mode in [
       step=5,
       help="Sets the upper limit for the numbers being added.",
   )
+
+if practice_mode == "Divisions with remainders":
+  st.sidebar.markdown("---")
+  training_remainders = st.sidebar.segmented_control(
+      "Training mode:",
+      options=["No", "Yes"],
+      default="No",
+      selection_mode="single", 
+      required=True, 
+  )
+
+      
 
 
 # Function to generate a new Rapid Fire question
