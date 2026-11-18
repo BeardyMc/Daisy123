@@ -267,7 +267,7 @@ def generate_remainders():
 current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit, training_remainders)
 
 
-# if sidebar mode changed
+# if sidebar mode not recorded or changed 
 if (
     "prev_filter_state" not in st.session_state
     or st.session_state.prev_filter_state != current_filter_state
@@ -283,6 +283,7 @@ if (
   elif practice_mode == "Divisions with remainders":
     generate_remainders() 
 
+# catch, don't think will ever execute
 if ("num1" not in st.session_state):
   if practice_mode not in [
         "Multiplication Table (Grid Completion)",
