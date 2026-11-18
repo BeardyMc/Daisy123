@@ -771,6 +771,10 @@ elif practice_mode == "Divisions with remainders":
           "avg_time_per_question": avg_time,
       }
 
+      # Clear input box session states so they reset for the next question
+      st.session_state.live_q = None
+      st.session_state.live_r = None
+
       generate_remainders()
       st.rerun()  
  
