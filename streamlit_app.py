@@ -712,12 +712,67 @@ elif practice_mode == "Divisions with remainders":
  
                   
 
-  # Submit action button
- # if st.button("Submit answer 🚀", use_container_width=True):
-      # Put your submission / score checking logic here using current_q and user_remainder!
- 
-     
+  # ==========================================
+  # SUBMISSION BUTTON & GRADING LOGIC
+  # ==========================================
+  if st.button("Submit answer 🚀", use_container_width=True):
+      # 1. Timer / tracking setup (matching your other modes)
+      if "start_time" not in st.session_state:
+          st.session_state.start_time = time.time()
 
+      elapsed_time = time.time() - st.session_state.start_time 
+      st.session_state.total_questions += 1
+
+      # Get user inputs safely
+      q_attempt = user_quotient if user_quotient is not None else 0
+      r_attempt = user_remainder if user_remainder is not None else 0
+
+      correct_q = st.session_state.correct_quotient
+      correct_r = st.session_state.correct_remainder
+
+      # 2. Check if both quotient and remainder match
+      if q_attempt == correct_q and r_attempt == correct_r:
+          st.session_state.score += 1
+          st.session_state.streak += 1
+          st.session_state.last_feedback = (
+              "success",
+              random.choice(daisy_success_messages),
+          )
+          if st.session_state.streak % 5 == 0:
+              st.session_state.trigger_balloons = True
+          else:
+              st.session_state.trigger_balloons = False
+          
+          
+      else:
+          # Reset streak on failure
+          st.session_state.streak = 0
+          st.session_state.trigger_balloons = False
+
+          # Calculate what her entered answer would have evaluated to
+          attempted_total = (q_attempt * n2) + r_attempt
+          
+          st.session_state.last_feedback = (
+              "error",
+              f"❌ Oops, the correct answer was **{correct_q}r{correct_r}**. "
+              f"Your answer of {q_attempt}r{r_attempt} would have given **{attempted_total}** "
+              f"({q_attempt} × {n2} + {r_attempt} = {attempted_total}). Keep trying!"
+          )
+
+      # save data
+      formatted_duration = format_time(elapsed_time)
+      avg_time = format_time(elapsed_time / st.session_state.total_questions) 
+      st.session_state.current_save = {
+          "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+          "mode": practice_mode,
+          "total": st.session_state.total_questions,
+          "score": st.session_state.score,
+          "total_time_seconds": formatted_duration, 
+          "avg_time_per_question": avg_time,
+      }
+
+      generate_remainders()
+      st.rerun()  
  
          
 
