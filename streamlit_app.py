@@ -263,7 +263,7 @@ def generate_remainder():
 
 # --- Detect Mode OR Sub-menu Changes ---
 # Sort the tables tuple so toggling pill order doesn't re-trigger question generation
-current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition limit, training_remainders)
+current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit, training_remainders)
 
 
 if (
