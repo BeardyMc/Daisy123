@@ -666,7 +666,7 @@ elif practice_mode == "Divisions with remainders":
               "Remainder", min_value=0, step=1, value=None, key="live_r"
           )
 
-  # Live Dynamic Training Mode Feedback (updates instantly as she changes numbers!)
+# Live Dynamic Training Mode Feedback (updates instantly as she changes numbers!)
   if training_remainders == "Yes":
       # Treat None as 0 so the logic doesn't crash when empty
       current_q = user_quotient if user_quotient is not None else 0
