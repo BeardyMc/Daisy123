@@ -251,7 +251,7 @@ def generate_question():
       st.session_state.op = "-" 
 
 # Function to generate division with remainder question
-def generate_remainder():
+def generate_remainders():
     b = random.randint(2, 12) # no ÷1
     r = random.randint(0, b-1) # from 0 to b-1
     a = random.randint(1, 12) 
