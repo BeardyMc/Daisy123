@@ -264,7 +264,7 @@ def generate_remainders():
 
 # --- Detect Mode OR Sub-menu Changes ---
 # Sort the tables tuple so toggling pill order doesn't re-trigger question generation
-current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit, training_remainders)
+current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit)
 
 
 # if sidebar mode not recorded or changed 
@@ -605,13 +605,12 @@ elif practice_mode == "Coin math":
 
 
 
-
 # ==========================================
 # MODE 4: Division with Remainders
 # ==========================================
 elif practice_mode == "Divisions with remainders":
   st.markdown("### ➗ Division with Remainders!")
-      
+
   # Scoreboard Display for Rapid Fire
   col1, col2, col3 = st.columns(3, wrap=False)
   col1.metric("Score 🏆", st.session_state.score)
@@ -626,35 +625,56 @@ elif practice_mode == "Divisions with remainders":
 
   st.markdown(f"### What is **{n1} {op} {n2}** ?")
 
-# Custom CSS to enlarge number inputs and stepper buttons for mobile touch
+  # Custom CSS to style the layout cleanly for mobile and desktop
   st.markdown(
       """
       <style>
+      /* Center align and enlarge number inputs */
       div.stNumberInput input {
-          font-size: 18px !important;
+          font-size: 20px !important;
           font-weight: bold !important;
           text-align: center;
       }
-      /* Make the stepper container / buttons easier to tap */
-      div.stNumberInput button {
-          transform: scale(1.25);
-          margin: 0px 4px;
+      /* Style the 'r' separator to look centered and clean */
+      .remainder-label {
+          font-size: 24px;
+          font-weight: bold;
+          text-align: center;
+          padding-top: 28px;
+          color: #FF4B4B;
       }
       </style>
   """,
       unsafe_allow_html=True,
   )
 
-  with st.form(key="rem_form", clear_on_submit=True):
-      col_q, col_m, col_r = st.columns([1,0.2,1], wrap=False)
-      with col_q:
-          user_quotient = st.number_input("Whole number (Quotient)", min_value=0, step=1, value=None)
-      with col_m:
-          st.write("r")
-      with col_r:
-          user_remainder = st.number_input("Remainder", min_value=0, step=1, value=None)
+  # Training Mode Hint Box (if enabled in sidebar)
+  if training_remainders == "Yes":
+      st.info(
+          f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
+          f" closest multiple of {n2} without going over {n1}?"
+      )
 
-      submit_rem = st.form_submit_button(label="Submit answer 🚀", use_container_width=True)
+  with st.form(key="rem_form", clear_on_submit=True):
+      # Balanced columns: Quotient box, 'r' label, Remainder box
+      col_q, col_m, col_r = st.columns([2, 0.6, 2], wrap=False)
+
+      with col_q:
+          user_quotient = st.number_input(
+              "Quotient (Whole)", min_value=0, step=1, value=None
+          )
+      with col_m:
+          st.markdown('<div class="remainder-label">r</div>', unsafe_allow_html=True)
+      with col_r:
+          user_remainder = st.number_input(
+              "Remainder", min_value=0, step=1, value=None
+          )
+
+      st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+      submit_rem = st.form_submit_button(
+          label="Submit answer 🚀", use_container_width=True
+      )
+
 
 
 
