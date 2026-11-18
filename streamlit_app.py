@@ -671,33 +671,33 @@ elif practice_mode == "Divisions with remainders":
   # ==========================================
   # DYNAMIC TRAINING MODE HINT & FEEDBACK LOGIC
   # ==========================================
-    if training_remainders == "Yes":
+      if training_remainders == "Yes":
       # Check if she has typed anything into the quotient box yet
-        if user_quotient is not None and user_quotient > 0:
-            product_attempt = user_quotient * n2
-            remainder_attempt = n1 - product_attempt
+          if user_quotient is not None and user_quotient > 0:
+              product_attempt = user_quotient * n2
+              remainder_attempt = n1 - product_attempt
 
-            if product_attempt > n1:
-                st.warning(
-                    f"⚠️ **Too big!** {user_quotient} × {n2} = {product_attempt},"
-                    f" which is more than your target of {n1}. Try a smaller number!"
-                )
-            elif remainder_attempt >= n2:
-                st.info(
-                    f"💡 {user_quotient} lots of {n2} is {product_attempt}. There"
-                    f" are still **{remainder_attempt}** left to share—you can"
-                    " fit more in!"
-                )
-            else:
-                st.success(
-                    f"🎯 Perfect! {user_quotient} × {n2} = {product_attempt},"
-                    f" leaving {remainder_attempt} remaining."
-                )
-        else:
-            st.info(
-                f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
-                f" closest multiple of {n2} below {n1}?"
-            )
+              if product_attempt > n1:
+                  st.warning(
+                      f"⚠️ **Too big!** {user_quotient} × {n2} = {product_attempt},"
+                      f" which is more than your target of {n1}. Try a smaller number!"
+                  )
+              elif remainder_attempt >= n2:
+                  st.info(
+                      f"💡 {user_quotient} lots of {n2} is {product_attempt}. There"
+                      f" are still **{remainder_attempt}** left to share—you can"
+                      " fit more in!"
+                  )
+              else:
+                  st.success(
+                      f"🎯 Perfect! {user_quotient} × {n2} = {product_attempt},"
+                      f" leaving {remainder_attempt} remaining."
+                  )
+          else:
+              st.info(
+                  f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
+                  f" closest multiple of {n2} below {n1}?"
+              )
 
 
 
