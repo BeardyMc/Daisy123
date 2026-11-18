@@ -76,6 +76,9 @@ if "start_time" not in st.session_state:
     st.session_state.start_time = None
 if "current_save" not in st.session_state:
     st.session_state.current_save = None
+if "remainder_question_count" not in st.session_state:
+    st.session_state.remainder_question_count = 0
+
 
 # Grid Mode State Initialization
 if "grid_completed" not in st.session_state:
@@ -260,9 +263,7 @@ def generate_remainders():
     st.session_state.correct_quotient = a    
     st.session_state.correct_remainder = r
     st.session_state.op = "÷"
-# Clear the input widget states if new question called
-    st.session_state.live_q = None
-    st.session_state.live_r = None
+    st.session_state.remainder_question_count +=1
 
 
 # --- Detect Mode OR Sub-menu Changes ---
@@ -651,19 +652,22 @@ elif practice_mode == "Divisions with remainders":
       unsafe_allow_html=True,
   )
 
+  q_key = f"live_q_{st.session_state.remainder_question_count}"
+  r_key = f"live_r_{st.session_state.remainder_question_count}"
+
   with st.container():
-      col_q, col_m, col_r = st.columns([2, 0.4, 2], wrap=False)
+      col_q, col_m, col_r = st.columns([2, 0.2, 2], wrap=False)
 
       with col_q:
           # If value is None, treat it as 0 for live calculations
           user_quotient = st.number_input(
-              "Quotient (Whole)", min_value=0, step=1, value=None, key="live_q"
+              "Quotient (Whole)", min_value=0, step=1, value=None, key=q_key
           )
       with col_m:
           st.markdown('<div class="remainder-label">r</div>', unsafe_allow_html=True)
       with col_r:
           user_remainder = st.number_input(
-              "Remainder", min_value=0, step=1, value=None, key="live_r"
+              "Remainder", min_value=0, step=1, value=None, key=r_key
           )
 
 
