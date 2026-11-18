@@ -699,7 +699,7 @@ elif practice_mode == "Divisions with remainders":
           )
 
   # Separate submit action button (since we removed st.form, or you can use a regular button check)
-  if st.button("Submit answer 🚀", use_container_width=True):
+ # if st.button("Submit answer 🚀", use_container_width=True):
       # Put your submission / score checking logic here using current_q and user_remainder!
  
      
