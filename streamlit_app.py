@@ -400,24 +400,17 @@ if practice_mode == "Multiplication Table (Grid Completion)":
     if submit_button:
       if st.session_state.start_time is None:
         st.session_state.start_time = time.time() 
+      elapsed_time = time.time() - st.session_state.start_time 
       if user_answer is None:
         st.warning("Please type an answer first! 😊")
       else:
+        # Track total attempts/interactions for the save state
+        # (Total completed cells + failed revealed cells represent total grid tries)
+        total_grid_attempts = len(st.session_state.grid_completed)
+        
         if user_answer == correct_answer:
           st.session_state.grid_completed[(r, c)] = "correct"
           st.session_state.grid_correct_score += 1
-          elapsed_time = time.time() - st.session_state.start_time
-          formatted_duration = format_time(elapsed_time)
-          avg_time = format_time(elapsed_time / (completed_count+1)) 
-          st.session_state.current_save = {
-              "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-              "mode": practice_mode,
-              "total": completed_count+1,
-              "score": st.session_state.grid_correct_score,
-              "total_time_seconds": formatted_duration, 
-              "avg_time_per_question": avg_time,
-          }
-
           st.session_state.streak += 1
           st.session_state.last_feedback = (
               "success",
@@ -427,8 +420,10 @@ if practice_mode == "Multiplication Table (Grid Completion)":
             st.session_state.trigger_balloons = True
           else:
             st.session_state.trigger_balloons = False
+            
+          # Move to next target
           pick_next_grid_target()
-          st.rerun()
+          
         else:
           if st.session_state.grid_attempts == 0:
             st.session_state.grid_attempts += 1
@@ -438,6 +433,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
                 f" square ({r} × {c}).",
             )
             st.session_state.trigger_balloons = False
+            # Return early here since she gets a second try on the SAME square (no score/target change yet)
             st.rerun()
           else:
             # Second wrong attempt -> fill in as revealed
@@ -450,8 +446,27 @@ if practice_mode == "Multiplication Table (Grid Completion)":
                 f" **{correct_answer}**. It has been filled in for you.",
             )
             st.session_state.trigger_balloons = False
+            
+            # Move to next target since this cell is now closed out
             pick_next_grid_target()
-            st.rerun()
+
+        # UPDATE CURRENT_SAVE HERE: Fires whenever a grid square is finalized (correct or revealed)
+        formatted_duration = format_time(elapsed_time)
+        completed_count = len(st.session_state.grid_completed)
+        avg_time = format_time(elapsed_time / completed_count) if completed_count > 0 else "0.0s"
+        
+        st.session_state.current_save = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "mode": practice_mode,
+            "total": completed_count,
+            "score": st.session_state.grid_correct_score,
+            "total_time_seconds": formatted_duration, 
+            "avg_time_per_question": avg_time,
+        }
+
+        st.rerun() 
+
+
 
 # ==========================================
 # MODE 3: COIN MATH
@@ -508,50 +523,55 @@ elif practice_mode == "Coin math":
   if submit_coins:
     if st.session_state.start_time is None:
       st.session_state.start_time = time.time()
-    
+    elapsed_time = time.time() - st.session_state.start_time
+
     total_calculated = (c50 * 50) + (c20 * 20) + (c10 * 10) + (c5 * 5) + (c2 * 2) + (c1 * 1)
     user_total_coins = c50 + c20 + c10 + c5 + c2 + c1
     st.session_state.total_questions += 1
 
+    is_perfect = False
     if total_calculated == st.session_state.coin_target:
       min_possible_coins = get_min_coins(st.session_state.coin_target)
 
       if user_total_coins == min_possible_coins:
-        # Correct amount AND most efficient!
         st.session_state.score += 1
         st.session_state.streak += 1
-        elapsed_time = time.time() - st.session_state.start_time
-        formatted_duration = format_time(elapsed_time)
-        avg_time = format_time(elapsed_time / st.session_state.total_questions)
-        st.session_state.current_save = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "mode": practice_mode,
-            "total": st.session_state.total_questions,
-            "score": st.session_state.score,
-            "total_time_seconds": formatted_duration,
-            "avg_time_per_question": avg_time,
-        }
+        is_perfect = True
         st.session_state.last_feedback = ("success", random.choice(daisy_success_messages))
         if st.session_state.streak % 5 == 0:
           st.session_state.trigger_balloons = True
-        st.session_state.coin_target = random.randint(1, 99)
-        st.rerun()
       else:
-        # Right value, but too many coins used!
         st.session_state.streak = 0
         st.session_state.last_feedback = (
             "error",
             f"⚠️ That adds up to **{st.session_state.coin_target}p**, but can you do it with **fewer coins**? (You used {user_total_coins}, perfection is {min_possible_coins}!)",
         )
-        st.rerun()
     else:
       st.session_state.streak = 0
       st.session_state.last_feedback = (
           "error",
           f"❌ Not quite! Your coins added up to **{total_calculated}p**, but the target was **{st.session_state.coin_target}p**.",
       )
+
+    # UPDATE CURRENT_SAVE HERE: Always captures every attempt
+    formatted_duration = format_time(elapsed_time)
+    avg_time = format_time(elapsed_time / st.session_state.total_questions)
+    st.session_state.current_save = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "mode": practice_mode,
+        "total": st.session_state.total_questions,
+        "score": st.session_state.score,
+        "total_time_seconds": formatted_duration,
+        "avg_time_per_question": avg_time,
+    }
+
+    if is_perfect:
       st.session_state.coin_target = random.randint(1, 99)
-      st.rerun() 
+    st.rerun()
+
+
+
+
       
 
 
@@ -596,6 +616,7 @@ else:
   if submit_button:
     if st.session_state.start_time is None:
       st.session_state.start_time = time.time()
+    elapsed_time = time.time() - st.session_state.start_time
     if user_answer is None:
       st.warning("Please type an answer first! 😊")
     else:
@@ -603,19 +624,6 @@ else:
       if user_answer == correct_answer:
         st.session_state.score += 1
         st.session_state.streak += 1
-
-        elapsed_time = time.time() - st.session_state.start_time
-        formatted_duration = format_time(elapsed_time)
-        avg_time = format_time(elapsed_time / st.session_state.total_questions) 
-        st.session_state.current_save = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "mode": practice_mode,
-            "total": st.session_state.total_questions,
-            "score": st.session_state.score,
-            "total_time_seconds": formatted_duration, 
-            "avg_time_per_question": avg_time,
-        }
-
         st.session_state.last_feedback = (
             "success",
             random.choice(daisy_success_messages),
@@ -628,13 +636,25 @@ else:
         st.session_state.streak = 0
         st.session_state.last_feedback = (
             "error",
-            f"❌ Not quite! The correct answer was **{correct_answer}**. Keep"
-            " going!",
+            f"❌ Not quite! The correct answer was **{correct_answer}**. Keep going!",
         )
         st.session_state.trigger_balloons = False
 
+      # UPDATE CURRENT_SAVE HERE: Runs on EVERY attempt (right or wrong)
+      formatted_duration = format_time(elapsed_time)
+      avg_time = format_time(elapsed_time / st.session_state.total_questions) 
+      st.session_state.current_save = {
+          "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+          "mode": practice_mode,
+          "total": st.session_state.total_questions,
+          "score": st.session_state.score,
+          "total_time_seconds": formatted_duration, 
+          "avg_time_per_question": avg_time,
+      }
+
       generate_question()
-      st.rerun()
+      st.rerun() 
+
 
 
 # --- Display Feedback & Balloons ---
