@@ -647,12 +647,9 @@ elif practice_mode == "Divisions with remainders":
   """,
       unsafe_allow_html=True,
   )
-
-    # Training Mode Hint Box (placed above or below now that it's live!)
-  # We handle None safely here so if it's empty, it defaults to 0 or doesn't throw a type error
   
   with st.container():
-      col_q, col_m, col_r = st.columns([2, 0.6, 2], wrap=False)
+      col_q, col_m, col_r = st.columns([2, 0.4, 2], wrap=False)
 
       with col_q:
           # If value is None, treat it as 0 for live calculations
@@ -666,11 +663,15 @@ elif practice_mode == "Divisions with remainders":
               "Remainder", min_value=0, step=1, value=None, key="live_r"
           )
 
-# Live Dynamic Training Mode Feedback (updates instantly as she changes numbers!)
+
+  # Live Dynamic Training Mode Feedback
   if training_remainders == "Yes":
-      # Treat None as 0 so the logic doesn't crash when empty
       current_q = user_quotient if user_quotient is not None else 0
+      current_r = user_remainder if user_remainder is not None else None
       
+      correct_q = st.session_state.correct_quotient
+      correct_r = st.session_state.correct_remainder
+
       if current_q > 0:
           product_attempt = current_q * n2
           remainder_attempt = n1 - product_attempt
@@ -678,25 +679,39 @@ elif practice_mode == "Divisions with remainders":
           if product_attempt > n1:
               st.warning(
                   f"⚠️ **Too big!** {current_q} × {n2} = {product_attempt},"
-                  f" which is more than your target of {n1}. Try a smaller"
-                  " number!"
+                  f" which is more than your target of {n1}. Try a smaller number!"
               )
           elif remainder_attempt >= n2:
               st.info(
                   f"💡 {current_q} lots of {n2} is {product_attempt}. There"
-                  f" are still **{remainder_attempt}** left to share—you can"
-                  " fit more in!"
+                  f" is still **{remainder_attempt}** left to divide!"
               )
           else:
-              st.success(
-                  f"🎯 Perfect chunk! {current_q} × {n2} = {product_attempt},"
-                  f" leaving {remainder_attempt} remaining."
-              )
+              # Quotient is correct! Now check the remainder box
+              if current_r is None:
+                  st.info(
+                      f"🎯 Perfect whole number! {current_q} × {n2} ="
+                      f" {product_attempt}, leaving **{remainder_attempt}**"
+                      " remaining. Enter that into the remainder box!"
+                  )
+              elif current_r == correct_r:
+                  st.success(
+                      f"🌟 Spot on! {correct_q} × {n2} + {correct_r} makes"
+                      f" {n1}. Hit submit below for your next question!"
+                  )
+              else:
+                  st.warning(
+                      f"⚠️ Close! {current_q} × {n2} = {product_attempt},"
+                      f" but check your remainder. You have {remainder_attempt}"
+                      " left over!"
+                  )
       else:
           st.info(
               f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
               f" closest multiple of {n2} below {n1}?"
           )
+ 
+                  
 
   # Separate submit action button (since we removed st.form, or you can use a regular button check)
  # if st.button("Submit answer 🚀", use_container_width=True):
