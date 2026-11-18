@@ -647,7 +647,11 @@ elif practice_mode == "Divisions with remainders":
   """,
       unsafe_allow_html=True,
   )
-  
+
+  # initialise container
+  if "live_q" not in st.session_state:
+      st.session_state.live_q = None
+      st.session_state.live_r = None
   with st.container():
       col_q, col_m, col_r = st.columns([2, 0.4, 2], wrap=False)
 
