@@ -643,6 +643,7 @@ if practice_mode == "Divisions with remainders":
       </style>
   """,
       unsafe_allow_html
+  ) 
 
   col_q, col_m, col_r = st.columns([1,0.2,1], wrap=False)
   with col_q:
