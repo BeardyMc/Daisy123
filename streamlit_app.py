@@ -33,6 +33,9 @@ def save_score_to_bin(new_entry):
   """Appends a new practice session record to JSONBin.io"""
   history = load_score_history()
   history.append(new_entry)
+  # Keep the last 1,000 entries for long-term improvement tracking
+  history = history[-1000:] 
+
   payload = {"history": history}
   url = f"https://api.jsonbin.io/v3/b/{BIN_ID}"
 
@@ -112,8 +115,18 @@ def format_time(seconds):
     mins = int(seconds // 60)
     secs = seconds % 60
     if mins > 0:
-        return f"{mins} min {secs:.1f}s"
+        return f"{mins} min {secs:.0f}s"
     return f"{secs:.1f}s"
+
+# --- Helper to calculate minimum coins for UK currency ---
+def get_min_coins(target):
+  coins = [50, 20, 10, 5, 2, 1]
+  count = 0
+  remaining = target
+  for coin in coins:
+    count += remaining // coin
+    remaining %= coin
+  return count
 
 
 # --- Sidebar Settings ---
@@ -126,68 +139,130 @@ practice_mode = st.sidebar.selectbox(
         "Rapid Fire: Division (÷)",
         "Rapid Fire: Simple Addition",
         "Rapid Fire: Mixed Arithmetic",
+        "Coin math",
     ],
 )
+# Dynamic Sidebar Filters based on mode choice
+selected_tables = list(range(1, 13))  # Default fallback
+addition_limit = 20  # Default fallback
+
+if practice_mode in [
+    "Rapid Fire: Multiplication (1-12)",
+    "Rapid Fire: Division (÷)",
+    "Rapid Fire: Mixed Arithmetic",
+]:
+# st.pills with multi-select enabled gives big, easy-to-tap touch targets 
+  selected_tables = st.sidebar.pills(
+      "Choose Multiples to Practice:",
+      options=list(range(1, 13)),
+      default=[2,3,4,5,6,7,8,9,11,12],
+      selection_mode="multi",
+      help="Select multiples to practice.",
+  ) 
+
+# Fallback if all are unchecked
+  if not selected_tables:
+    selected_tables = list(range(1, 13))
+ 
+
+if practice_mode in [
+    "Rapid Fire: Simple Addition",
+    "Rapid Fire: Mixed Arithmetic",
+]:
+  st.sidebar.markdown("---")
+  addition_limit = st.sidebar.slider(
+      "Maximum Addition Number:",
+      min_value=10,
+      max_value=500,
+      value=20,
+      step=5,
+      help="Sets the upper limit for the numbers being added.",
+  )
 
 
 # Function to generate a new Rapid Fire question
 def generate_question():
+  print(selected_tables, flush=True)
   if practice_mode == "Rapid Fire: Multiplication (1-12)":
-    st.session_state.num1 = random.randint(1, 12)
-    st.session_state.num2 = random.randint(1, 12)
+    a = random.choice(selected_tables)
+    b = random.randint(1, 12)
+    if random.choice([True, False]):
+      st.session_state.num1 = a
+      st.session_state.num2 = b
+    else:
+      st.session_state.num1 = b
+      st.session_state.num2 = a
     st.session_state.op = "×"
   elif practice_mode == "Rapid Fire: Division (÷)":
+    b = random.choice(selected_tables)
     a = random.randint(1, 12)
-    b = random.randint(1, 12)
     st.session_state.num1 = a * b
     st.session_state.num2 = b
     st.session_state.op = "÷"
   elif practice_mode == "Rapid Fire: Simple Addition":
-    st.session_state.num1 = random.randint(1, 20)
-    st.session_state.num2 = random.randint(1, 20)
+    st.session_state.num1 = random.randint(1, addition_limit)
+    st.session_state.num2 = random.randint(1, addition_limit)
     st.session_state.op = "+"
-  else:  # Mixed Arithmetic
+  elif practice_mode == "Rapid Fire: Mixed Arithmetic":
     op_choice = random.choice(["+", "-", "×", "÷"])
     if op_choice == "÷":
+      b = random.choice(selected_tables)
       a = random.randint(1, 12)
-      b = random.randint(1, 12)
       st.session_state.num1 = a * b
       st.session_state.num2 = b
       st.session_state.op = "÷"
     elif op_choice == "×":
-      st.session_state.num1 = random.randint(1, 12)
-      st.session_state.num2 = random.randint(1, 12)
+      a = random.choice(selected_tables)
+      b = random.randint(1, 12)
       st.session_state.op = "×"
+      if random.choice([True, False]):
+        st.session_state.num1 = a
+        st.session_state.num2 = b
+      else:
+        st.session_state.num1 = b
+        st.session_state.num2 = a
     elif op_choice == "+":
-      st.session_state.num1 = random.randint(1, 20)
-      st.session_state.num2 = random.randint(1, 20)
+      st.session_state.num1 = random.randint(1, addition_limit)
+      st.session_state.num2 = random.randint(1, addition_limit)
       st.session_state.op = "+"
     else:
-      st.session_state.num1 = random.randint(1, 20)
-      st.session_state.num2 = random.randint(1, 20)
-      if st.session_state.num1 < st.session_state.num2:
-        st.session_state.num1, st.session_state.num2 = (
-            st.session_state.num2,
-            st.session_state.num1,
-        )
-      st.session_state.op = "-"
+      a = random.randint(1, addition_limit)
+      b = random.randint(1, addition_limit)
+      if a < b:
+        st.session_state.num1 = b
+        st.session_state.num2 = a
+      else:
+        st.session_state.num1 = a
+        st.session_state.num2 = b
+      st.session_state.op = "-" 
 
 
-# Detect if mode changed in sidebar and update accordingly
+# --- Detect Mode OR Sub-menu Changes ---
+# Sort the tables tuple so toggling pill order doesn't re-trigger question generation
+current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit)
+
+
 if (
-    "prev_practice_mode" not in st.session_state
-    or st.session_state.prev_practice_mode != practice_mode
+    "prev_filter_state" not in st.session_state
+    or st.session_state.prev_filter_state != current_filter_state
 ):
-  st.session_state.prev_practice_mode = practice_mode
+  st.session_state.prev_filter_state = current_filter_state
   st.session_state.start_time = None
-  if practice_mode != "Multiplication Table (Grid Completion)":
+  if practice_mode not in [
+      "Multiplication Table (Grid Completion)",
+      "Coin math",
+  ]:
     generate_question()
 
 if (
-    practice_mode != "Multiplication Table (Grid Completion)"
+    practice_mode not in [
+        "Multiplication Table (Grid Completion)",
+        "Coin math",
+    ]
     and "num1" not in st.session_state
 ):
   generate_question()
+
 
 # Addable list of encouraging success calls
 daisy_success_messages = [
@@ -323,26 +398,19 @@ if practice_mode == "Multiplication Table (Grid Completion)":
       submit_button = st.form_submit_button(label="Submit Answer 🚀")
 
     if submit_button:
+      if st.session_state.start_time is None:
+        st.session_state.start_time = time.time() 
+      elapsed_time = time.time() - st.session_state.start_time 
       if user_answer is None:
         st.warning("Please type an answer first! 😊")
       else:
+        # Track total attempts/interactions for the save state
+        # (Total completed cells + failed revealed cells represent total grid tries)
+        total_grid_attempts = len(st.session_state.grid_completed)
+        
         if user_answer == correct_answer:
           st.session_state.grid_completed[(r, c)] = "correct"
           st.session_state.grid_correct_score += 1
-          if st.session_state.start_time is None:
-              st.session_state.start_time = time.time()
-          elapsed_time = time.time() - st.session_state.start_time
-          formatted_duration = format_time(elapsed_time)
-          avg_time = format_time(elapsed_time / (completed_count+1)) 
-          st.session_state.current_save = {
-              "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-              "mode": practice_mode,
-              "total": completed_count+1,
-              "score": st.session_state.grid_correct_score,
-              "total_time_seconds": formatted_duration, 
-              "avg_time_per_question": avg_time,
-          }
-
           st.session_state.streak += 1
           st.session_state.last_feedback = (
               "success",
@@ -352,8 +420,10 @@ if practice_mode == "Multiplication Table (Grid Completion)":
             st.session_state.trigger_balloons = True
           else:
             st.session_state.trigger_balloons = False
+            
+          # Move to next target
           pick_next_grid_target()
-          st.rerun()
+          
         else:
           if st.session_state.grid_attempts == 0:
             st.session_state.grid_attempts += 1
@@ -363,6 +433,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
                 f" square ({r} × {c}).",
             )
             st.session_state.trigger_balloons = False
+            # Return early here since she gets a second try on the SAME square (no score/target change yet)
             st.rerun()
           else:
             # Second wrong attempt -> fill in as revealed
@@ -375,8 +446,134 @@ if practice_mode == "Multiplication Table (Grid Completion)":
                 f" **{correct_answer}**. It has been filled in for you.",
             )
             st.session_state.trigger_balloons = False
+            
+            # Move to next target since this cell is now closed out
             pick_next_grid_target()
-            st.rerun()
+
+        # UPDATE CURRENT_SAVE HERE: Fires whenever a grid square is finalized (correct or revealed)
+        formatted_duration = format_time(elapsed_time)
+        completed_count = len(st.session_state.grid_completed)
+        avg_time = format_time(elapsed_time / completed_count) if completed_count > 0 else "0.0s"
+        
+        st.session_state.current_save = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "mode": practice_mode,
+            "total": completed_count,
+            "score": st.session_state.grid_correct_score,
+            "total_time_seconds": formatted_duration, 
+            "avg_time_per_question": avg_time,
+        }
+
+        st.rerun() 
+
+
+
+# ==========================================
+# MODE 3: COIN MATH
+# ==========================================
+elif practice_mode == "Coin math":
+  if "coin_target" not in st.session_state:
+    st.session_state.coin_target = random.randint(1, 99)
+
+# Custom CSS to enlarge number inputs and stepper buttons for mobile touch
+  st.markdown(
+      """
+      <style>
+      div.stNumberInput input {
+          font-size: 18px !important;
+          font-weight: bold !important;
+          text-align: center;
+      }
+      /* Make the stepper container / buttons easier to tap */
+      div.stNumberInput button {
+          transform: scale(1.25);
+          margin: 0px 4px;
+      }
+      </style>
+  """,
+      unsafe_allow_html=True,
+  )
+
+  col1, col2, col3 = st.columns(3, wrap=False)
+  col1.metric("Score 🏆", st.session_state.score)
+  col2.metric("Answered 📝", st.session_state.total_questions)
+  col3.metric("Streak 🔥", st.session_state.streak)
+
+  st.markdown("---")
+  st.markdown(f"### 🪙 Make the target amount: **{st.session_state.coin_target}p**")
+  st.write("Select how many of each coin you need:")
+
+  with st.form(key="coin_form", clear_on_submit=True):
+    # 2-Column Grid Layout to cut vertical length in half!
+    c_col1, c_col2 = st.columns(2, wrap=False)
+
+    with c_col1:
+      c50 = st.number_input("50p coins", min_value=0, value=0, step=1, format="%d")
+      c10 = st.number_input("10p coins", min_value=0, value=0, step=1, format="%d")
+      c2 = st.number_input("2p coins", min_value=0, value=0, step=1, format="%d")
+
+    with c_col2:
+      c20 = st.number_input("20p coins", min_value=0, value=0, step=1, format="%d")
+      c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
+      c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
+
+    submit_coins = st.form_submit_button(label="Check Coins 🚀", use_container_width=True)
+ 
+
+  if submit_coins:
+    if st.session_state.start_time is None:
+      st.session_state.start_time = time.time()
+    elapsed_time = time.time() - st.session_state.start_time
+
+    total_calculated = (c50 * 50) + (c20 * 20) + (c10 * 10) + (c5 * 5) + (c2 * 2) + (c1 * 1)
+    user_total_coins = c50 + c20 + c10 + c5 + c2 + c1
+    st.session_state.total_questions += 1
+
+    is_perfect = False
+    if total_calculated == st.session_state.coin_target:
+      min_possible_coins = get_min_coins(st.session_state.coin_target)
+
+      if user_total_coins == min_possible_coins:
+        st.session_state.score += 1
+        st.session_state.streak += 1
+        is_perfect = True
+        st.session_state.last_feedback = ("success", random.choice(daisy_success_messages))
+        if st.session_state.streak % 5 == 0:
+          st.session_state.trigger_balloons = True
+      else:
+        st.session_state.streak = 0
+        st.session_state.last_feedback = (
+            "error",
+            f"⚠️ That adds up to **{st.session_state.coin_target}p**, but can you do it with **fewer coins**? (You used {user_total_coins}, perfection is {min_possible_coins}!)",
+        )
+    else:
+      st.session_state.streak = 0
+      st.session_state.last_feedback = (
+          "error",
+          f"❌ Not quite! Your coins added up to **{total_calculated}p**, but the target was **{st.session_state.coin_target}p**.",
+      )
+
+    # UPDATE CURRENT_SAVE HERE: Always captures every attempt
+    formatted_duration = format_time(elapsed_time)
+    avg_time = format_time(elapsed_time / st.session_state.total_questions)
+    st.session_state.current_save = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "mode": practice_mode,
+        "total": st.session_state.total_questions,
+        "score": st.session_state.score,
+        "total_time_seconds": formatted_duration,
+        "avg_time_per_question": avg_time,
+    }
+
+    if is_perfect:
+      st.session_state.coin_target = random.randint(1, 99)
+    st.rerun()
+
+
+
+
+      
+
 
 
 # ==========================================
@@ -417,28 +614,16 @@ else:
     submit_button = st.form_submit_button(label="Submit Answer 🚀")
 
   if submit_button:
+    if st.session_state.start_time is None:
+      st.session_state.start_time = time.time()
+    elapsed_time = time.time() - st.session_state.start_time
     if user_answer is None:
       st.warning("Please type an answer first! 😊")
     else:
       st.session_state.total_questions += 1
       if user_answer == correct_answer:
-        if st.session_state.start_time is None:
-          st.session_state.start_time = time.time()
         st.session_state.score += 1
         st.session_state.streak += 1
-
-        elapsed_time = time.time() - st.session_state.start_time
-        formatted_duration = format_time(elapsed_time)
-        avg_time = format_time(elapsed_time / st.session_state.total_questions) 
-        st.session_state.current_save = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "mode": practice_mode,
-            "total": st.session_state.total_questions,
-            "score": st.session_state.score,
-            "total_time_seconds": formatted_duration, 
-            "avg_time_per_question": avg_time,
-        }
-
         st.session_state.last_feedback = (
             "success",
             random.choice(daisy_success_messages),
@@ -451,13 +636,25 @@ else:
         st.session_state.streak = 0
         st.session_state.last_feedback = (
             "error",
-            f"❌ Not quite! The correct answer was **{correct_answer}**. Keep"
-            " going!",
+            f"❌ Not quite! The correct answer was **{correct_answer}**. Keep going!",
         )
         st.session_state.trigger_balloons = False
 
+      # UPDATE CURRENT_SAVE HERE: Runs on EVERY attempt (right or wrong)
+      formatted_duration = format_time(elapsed_time)
+      avg_time = format_time(elapsed_time / st.session_state.total_questions) 
+      st.session_state.current_save = {
+          "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+          "mode": practice_mode,
+          "total": st.session_state.total_questions,
+          "score": st.session_state.score,
+          "total_time_seconds": formatted_duration, 
+          "avg_time_per_question": avg_time,
+      }
+
       generate_question()
-      st.rerun()
+      st.rerun() 
+
 
 
 # --- Display Feedback & Balloons ---
@@ -480,19 +677,7 @@ col_save, col_reset = st.columns(2, wrap=False)
 
 with col_save:
   if st.button("💾 Save Score to Cloud", key="save_cloud_btn"):
-    if (
-        practice_mode == "Multiplication Table (Grid Completion)"
-        and (
-            st.session_state.grid_correct_score > 0
-            or st.session_state.grid_failed_score > 0
-        )
-    ):
-        save_score_to_bin(st.session_state.current_save)
-      
-    elif (
-        practice_mode != "Multiplication Table (Grid Completion)"
-        and st.session_state.total_questions > 0
-    ):
+    if st.session_state.current_save != None:
         save_score_to_bin(st.session_state.current_save)
         st.session_state.current_save = None
     else:
@@ -506,13 +691,18 @@ with col_reset:
       st.session_state.grid_correct_score = 0
       st.session_state.grid_failed_score = 0
       pick_next_grid_target()
+    elif practice_mode == "Coin math":
+      st.session_state.score = 0
+      st.session_state.total_questions = 0
+      st.session_state.streak = 0
+      st.session_state.coin_target = random.randint(1, 99)
     else:
       st.session_state.score = 0
       st.session_state.total_questions = 0
       st.session_state.streak = 0
-
       generate_question()
     st.rerun()
+
 
 
 # --- Parent / History Dashboard ---
