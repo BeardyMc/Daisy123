@@ -626,6 +626,33 @@ if practice_mode == "Divisions with remainders":
 
   st.markdown(f"### What is **{n1} {op} {n2}** ?")
 
+# Custom CSS to enlarge number inputs and stepper buttons for mobile touch
+  st.markdown(
+      """
+      <style>
+      div.stNumberInput input {
+          font-size: 18px !important;
+          font-weight: bold !important;
+          text-align: center;
+      }
+      /* Make the stepper container / buttons easier to tap */
+      div.stNumberInput button {
+          transform: scale(1.25);
+          margin: 0px 4px;
+      }
+      </style>
+  """,
+      unsafe_allow_html
+
+  col_q, col_m, col_r = st.columns([1,0.2,1], wrap=False)
+  with col_q:
+      user_quotient = st.number_input("Whole number (Quotient)", min_value=0, step=1, value=None)
+  with col_m:
+      st.write("r")
+  with col_r:
+      user_remainder = st.number_input("Remainder", min_value=0, step=1, value=None)
+
+submit_rem = st.form_submit_button(label="Submit answer 🚀", use_container_width=True)
 
 
 
