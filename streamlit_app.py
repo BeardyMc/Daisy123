@@ -253,7 +253,7 @@ def generate_question():
 # Function to generate division with remainder question
 def generate_remainders():
     b = random.randint(2, 12) # no ÷1
-    r = random.randint(1, b-1) # from 0 to b-1
+    r = random.randint(0, b-1) # from 0 to b-1
     a = random.randint(1, 12) 
     st.session_state.num1 = a * b + r
     st.session_state.num2 = b
@@ -717,7 +717,7 @@ elif practice_mode == "Divisions with remainders":
   # ==========================================
   if st.button("Submit answer 🚀", use_container_width=True):
       # 1. Timer / tracking setup (matching your other modes)
-      if "start_time" not in st.session_state:
+      if st.session_state.start_time is None:
           st.session_state.start_time = time.time()
 
       elapsed_time = time.time() - st.session_state.start_time 
