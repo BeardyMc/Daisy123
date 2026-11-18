@@ -260,6 +260,9 @@ def generate_remainders():
     st.session_state.correct_quotient = a    
     st.session_state.correct_remainder = r
     st.session_state.op = "÷"
+# Clear the input widget states if new question called
+    st.session_state.live_q = None
+    st.session_state.live_r = None
 
 
 # --- Detect Mode OR Sub-menu Changes ---
@@ -648,10 +651,6 @@ elif practice_mode == "Divisions with remainders":
       unsafe_allow_html=True,
   )
 
-  # initialise container
-  if "live_q" not in st.session_state:
-      st.session_state.live_q = None
-      st.session_state.live_r = None
   with st.container():
       col_q, col_m, col_r = st.columns([2, 0.4, 2], wrap=False)
 
@@ -775,10 +774,6 @@ elif practice_mode == "Divisions with remainders":
               "total_time_seconds": formatted_duration, 
               "avg_time_per_question": avg_time,
           }
-
-      # Clear input box session states so they reset for the next question
-          st.session_state.live_q = None
-          st.session_state.live_r = None
 
           generate_remainders()
           st.rerun()  
