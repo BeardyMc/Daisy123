@@ -403,7 +403,6 @@ if practice_mode == "Multiplication Table (Grid Completion)":
       elapsed_time = time.time() - st.session_state.start_time 
       if user_answer is None:
         st.warning("Please type an answer first! 😊")
-        return # Stop execution here so blank inputs don't count as wrong
       else:
         # Track total attempts/interactions for the save state
         # (Total completed cells + failed revealed cells represent total grid tries)
