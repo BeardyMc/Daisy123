@@ -500,7 +500,7 @@ elif practice_mode == "Coin math":
   col3.metric("Streak 🔥", st.session_state.streak)
 
   st.markdown("---")
-  st.markdown(f"### 🪙 Make the target amount: **{st.session_state.coin_target}p**")
+  st.markdown(f"### 🪙 Add coins to the target amount: **{st.session_state.coin_target}p**")
   st.write("Select how many of each coin you need:")
 
   with st.form(key="coin_form", clear_on_submit=True):
@@ -517,7 +517,7 @@ elif practice_mode == "Coin math":
       c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
       c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
 
-    submit_coins = st.form_submit_button(label="Check Coins 🚀", use_container_width=True)
+    submit_coins = st.form_submit_button(label="Sumbit answer 🚀", use_container_width=True)
  
 
   if submit_coins:
