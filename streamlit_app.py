@@ -702,8 +702,7 @@ elif practice_mode == "Divisions with remainders":
               else:
                   st.warning(
                       f"⚠️ Close! {current_q} × {n2} = {product_attempt},"
-                      f" but check your remainder. You have {remainder_attempt}"
-                      " left over!"
+                      f" but check your remainder. You should have {remainder_attempt} remainder!"
                   )
       else:
           st.info(
@@ -713,7 +712,7 @@ elif practice_mode == "Divisions with remainders":
  
                   
 
-  # Separate submit action button (since we removed st.form, or you can use a regular button check)
+  # Submit action button
  # if st.button("Submit answer 🚀", use_container_width=True):
       # Put your submission / score checking logic here using current_q and user_remainder!
  
