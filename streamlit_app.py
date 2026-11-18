@@ -146,6 +146,7 @@ practice_mode = st.sidebar.selectbox(
 # Dynamic Sidebar Filters based on mode choice
 selected_tables = list(range(1, 13))  # Default fallback
 addition_limit = 20  # Default fallback
+training_remainders = "No" # default
 
 if practice_mode in [
     "Rapid Fire: Multiplication (1-12)",
