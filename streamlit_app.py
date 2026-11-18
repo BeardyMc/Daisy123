@@ -249,10 +249,21 @@ def generate_question():
         st.session_state.num2 = b
       st.session_state.op = "-" 
 
+# Function to generate division with remainder question
+def generate_remainder():
+    b = random.randint(2, 12) # no ÷1
+    r = random.randint(0, b-1) # from 0 to b-1
+    a = random.randint(1, 12) 
+    st.session_state.num1 = a * b + r
+    st.session_state.num2 = b
+    st.session_state.correct_quotient = a    
+    st.session_state.correct_remainder = r
+    st.session_state.op = "÷"
+
 
 # --- Detect Mode OR Sub-menu Changes ---
 # Sort the tables tuple so toggling pill order doesn't re-trigger question generation
-current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit)
+current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition limit, training_remainders)
 
 
 if (
@@ -264,17 +275,21 @@ if (
   if practice_mode not in [
       "Multiplication Table (Grid Completion)",
       "Coin math",
+      "Divisions with remainders"
   ]:
     generate_question()
+  elif practice_mode = "Divisions with remainders":
+    generate_remainders() 
 
-if (
-    practice_mode not in [
+if ("num1" not in st.session_state):
+  if practice_mode not in [
         "Multiplication Table (Grid Completion)",
         "Coin math",
-    ]
-    and "num1" not in st.session_state
-):
-  generate_question()
+        "Divisions with remainders"
+    ]:
+    generate_question()
+  elif practice_mode = "Divisions with remainders":
+    generate_remainders() 
 
 
 # Addable list of encouraging success calls
@@ -588,7 +603,13 @@ elif practice_mode == "Coin math":
 
 
 
+# ==========================================
+# MODE 4: Division with Remainders
+# ==========================================
+if practice_mode == "Divisions with remainders":
+  st.markdown("### ➗ Division with Remainders!")
       
+
 
 
 
