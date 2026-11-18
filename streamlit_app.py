@@ -278,7 +278,7 @@ if (
       "Divisions with remainders"
   ]:
     generate_question()
-  elif practice_mode = "Divisions with remainders":
+  elif practice_mode == "Divisions with remainders":
     generate_remainders() 
 
 if ("num1" not in st.session_state):
@@ -288,7 +288,7 @@ if ("num1" not in st.session_state):
         "Divisions with remainders"
     ]:
     generate_question()
-  elif practice_mode = "Divisions with remainders":
+  elif practice_mode == "Divisions with remainders":
     generate_remainders() 
 
 
