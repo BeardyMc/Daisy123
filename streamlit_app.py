@@ -253,7 +253,7 @@ def generate_question():
 # Function to generate division with remainder question
 def generate_remainders():
     b = random.randint(2, 12) # no ÷1
-    r = random.randint(0, b-1) # from 0 to b-1
+    r = random.randint(1, b-1) # from 0 to b-1
     a = random.randint(1, 12) 
     st.session_state.num1 = a * b + r
     st.session_state.num2 = b
@@ -267,6 +267,7 @@ def generate_remainders():
 current_filter_state = (practice_mode, tuple(sorted(selected_tables)), addition_limit, training_remainders)
 
 
+# if sidebar mode changed
 if (
     "prev_filter_state" not in st.session_state
     or st.session_state.prev_filter_state != current_filter_state
