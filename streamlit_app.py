@@ -609,7 +609,7 @@ elif practice_mode == "Coin math":
 # ==========================================
 # MODE 4: Division with Remainders
 # ==========================================
-if practice_mode == "Divisions with remainders":
+elif practice_mode == "Divisions with remainders":
   st.markdown("### ➗ Division with Remainders!")
       
   # Scoreboard Display for Rapid Fire
