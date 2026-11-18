@@ -716,8 +716,8 @@ elif practice_mode == "Divisions with remainders":
   # SUBMISSION BUTTON & GRADING LOGIC
   # ==========================================
   if st.button("Submit answer 🚀", use_container_width=True):
-      if user_quotient is None and user_remainder is None:
-          st.warning("Please type an answer first! 😊")
+      if user_quotient is None or user_remainder is None:
+          st.warning("Please type full answer first! 😊")
       else:
           if st.session_state.start_time is None:
               st.session_state.start_time = time.time()
