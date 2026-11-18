@@ -610,6 +610,19 @@ elif practice_mode == "Coin math":
 if practice_mode == "Divisions with remainders":
   st.markdown("### ➗ Division with Remainders!")
       
+  # Scoreboard Display for Rapid Fire
+  col1, col2, col3 = st.columns(3, wrap=False)
+  col1.metric("Score 🏆", st.session_state.score)
+  col2.metric("Answered 📝", st.session_state.total_questions)
+  col3.metric("Streak 🔥", st.session_state.streak)
+
+  st.markdown("---")
+
+  n1 = st.session_state.num1
+  n2 = st.session_state.num2
+  op = st.session_state.op
+
+  st.markdown(f"### What is **{n1} {op} {n2}** ?")
 
 
 
