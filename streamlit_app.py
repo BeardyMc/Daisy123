@@ -648,59 +648,64 @@ elif practice_mode == "Divisions with remainders":
       unsafe_allow_html=True,
   )
 
-  with st.form(key="rem_form", clear_on_submit=True):
-      # Balanced columns: Quotient box, 'r' label, Remainder box
+    # Training Mode Hint Box (placed above or below now that it's live!)
+  # We handle None safely here so if it's empty, it defaults to 0 or doesn't throw a type error
+  
+  with st.container():
       col_q, col_m, col_r = st.columns([2, 0.6, 2], wrap=False)
 
       with col_q:
+          # If value is None, treat it as 0 for live calculations
           user_quotient = st.number_input(
-              "Quotient (Whole)", min_value=0, step=1, value=None
+              "Quotient (Whole)", min_value=0, step=1, value=None, key="live_q"
           )
       with col_m:
           st.markdown('<div class="remainder-label">r</div>', unsafe_allow_html=True)
       with col_r:
           user_remainder = st.number_input(
-              "Remainder", min_value=0, step=1, value=None
+              "Remainder", min_value=0, step=1, value=None, key="live_r"
           )
 
-      st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-      submit_rem = st.form_submit_button(
-          label="Submit answer 🚀", use_container_width=True
-      )
+  # Live Dynamic Training Mode Feedback (updates instantly as she changes numbers!)
+  if training_remainders == "Yes":
+      # Treat None as 0 so the logic doesn't crash when empty
+      current_q = user_quotient if user_quotient is not None else 0
+      
+      if current_q > 0:
+          product_attempt = current_q * n2
+          remainder_attempt = n1 - product_attempt
 
-  # ==========================================
-  # DYNAMIC TRAINING MODE HINT & FEEDBACK LOGIC
-  # ==========================================
-      if training_remainders == "Yes":
-      # Check if she has typed anything into the quotient box yet
-          if user_quotient is not None and user_quotient > 0:
-              product_attempt = user_quotient * n2
-              remainder_attempt = n1 - product_attempt
-
-              if product_attempt > n1:
-                  st.warning(
-                      f"⚠️ **Too big!** {user_quotient} × {n2} = {product_attempt},"
-                      f" which is more than your target of {n1}. Try a smaller number!"
-                  )
-              elif remainder_attempt >= n2:
-                  st.info(
-                      f"💡 {user_quotient} lots of {n2} is {product_attempt}. There"
-                      f" are still **{remainder_attempt}** left to share—you can"
-                      " fit more in!"
-                  )
-              else:
-                  st.success(
-                      f"🎯 Perfect! {user_quotient} × {n2} = {product_attempt},"
-                      f" leaving {remainder_attempt} remaining."
-                  )
-          else:
-              st.info(
-                  f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
-                  f" closest multiple of {n2} below {n1}?"
+          if product_attempt > n1:
+              st.warning(
+                  f"⚠️ **Too big!** {current_q} × {n2} = {product_attempt},"
+                  f" which is more than your target of {n1}. Try a smaller"
+                  " number!"
               )
+          elif remainder_attempt >= n2:
+              st.info(
+                  f"💡 {current_q} lots of {n2} is {product_attempt}. There"
+                  f" are still **{remainder_attempt}** left to share—you can"
+                  " fit more in!"
+              )
+          else:
+              st.success(
+                  f"🎯 Perfect chunk! {current_q} × {n2} = {product_attempt},"
+                  f" leaving {remainder_attempt} remaining."
+              )
+      else:
+          st.info(
+              f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
+              f" closest multiple of {n2} below {n1}?"
+          )
 
+  # Separate submit action button (since we removed st.form, or you can use a regular button check)
+  if st.button("Submit answer 🚀", use_container_width=True):
+      # Put your submission / score checking logic here using current_q and user_remainder!
+ 
+     
 
-
+ 
+         
 
 # ==========================================
 # MODE ELSE: All RAPID FIRE MODES
