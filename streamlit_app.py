@@ -473,7 +473,7 @@ if practice_mode == "Multiplication Table (Grid Completion)":
 # ==========================================
 elif practice_mode == "Coin math":
   if "coin_target" not in st.session_state:
-    st.session_state.coin_target = random.randint(1, 99)
+    st.session_state.coin_target = random.randint(3, 99)
 
 # Custom CSS to enlarge number inputs and stepper buttons for mobile touch
   st.markdown(
@@ -517,7 +517,7 @@ elif practice_mode == "Coin math":
       c5 = st.number_input("5p coins", min_value=0, value=0, step=1, format="%d")
       c1 = st.number_input("1p coins", min_value=0, value=0, step=1, format="%d")
 
-    submit_coins = st.form_submit_button(label="Sumbit answer 🚀", use_container_width=True)
+    submit_coins = st.form_submit_button(label="Submit answer 🚀", use_container_width=True)
  
 
   if submit_coins:
@@ -580,7 +580,7 @@ elif practice_mode == "Coin math":
 
 
 # ==========================================
-# MODE 2: RAPID FIRE MODES
+# MODE ELSE: All RAPID FIRE MODES
 # ==========================================
 else:
   # Scoreboard Display for Rapid Fire
