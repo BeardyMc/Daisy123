@@ -667,7 +667,7 @@ elif practice_mode == "Divisions with remainders":
           st.markdown('<div class="remainder-label">r</div>', unsafe_allow_html=True)
       with col_r:
           user_remainder = st.number_input(
-              "Remainder", min_value=0, step=1, value=None, key=r_key
+              "Remainder", min_value=0, step=1, value=0, key=r_key
           )
 
 
@@ -695,7 +695,7 @@ elif practice_mode == "Divisions with remainders":
               )
           else:
               # Quotient is correct! Now check the remainder box
-              if current_r is None:
+              if current_r is None or current_r<correct_r:
                   st.info(
                       f"🎯 Perfect whole number! {current_q} × {n2} ="
                       f" {product_attempt}, leaving **{remainder_attempt}**"
