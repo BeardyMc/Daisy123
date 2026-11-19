@@ -714,7 +714,7 @@ elif practice_mode == "Divisions with remainders":
       else:
           st.info(
               f"💡 **Training Hint:** Think about multiples of {n2}. What is the"
-              f" closest multiple of {n2} below {n1}?"
+              f" closest multiple of {n2} that isn't bigger than {n1}?"
           )
  
                   
